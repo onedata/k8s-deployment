@@ -20,4 +20,6 @@ type docker-compose >/dev/null 2>&1 || {
 docker-compose -f docker/docker-compose.yaml config
 docker-compose -f docker/docker-compose.yaml up --remove-orphans
 
-ls docker-compose 2>&1 && rm docker-compose
+if [[ -f docker-compose ]]; then
+ rm docker-compose
+fi

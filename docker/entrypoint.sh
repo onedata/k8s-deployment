@@ -28,7 +28,7 @@ helm search onedata
 echo "Starting to wait for all pods except for oneprovider to exit"
 while kubectl -n $NAMESPACE get pods -o name | grep -v '\-oneprovider' ; do
   sleep 1 ;
-  echo -n "Waiting for all pods except oneproviders to exit"
+  echo "Waiting for all pods except oneproviders to exit"
 done
 
 echo "Terminating all remaining pods"
@@ -40,7 +40,7 @@ echo "Waiting for pods to terminate"
 output="" ;
 while [[ "$output" != "No resources found." ]] ; do
   output=$(kubectl -n $NAMESPACE  get pod 2>&1)
-  echo -n "Waiting for the NAMESPACE=$NAMESPACE to be empty"
+  echo "Waiting for the NAMESPACE=$NAMESPACE to be empty"
   sleep 3
 done
 
