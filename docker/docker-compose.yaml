@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  landscaper:
+    image: groundnuty/landscaper:1.0.6-rc.1-kubectl
+    entrypoint: /entrypoint.sh
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh:ro
+      - ${KUBE_CONFIG}:/root/.kube/config:ro
+      - ../landscapes:/landscapes:ro
+    environment:
+      NAMESPACE: "$NAMESPACE"
+      OZ_IMAGE: "$OZ_IMAGE"
+      OP_IMAGE: "$OP_IMAGE"
+      OC_IMAGE: "$OC_IMAGE"
+      CLI_IMAGE: "$CLI_IMAGE"
+      RELEASE_NAME: "$RELEASE_NAME"
+
+# Needed to work in Cyfronet
+networks:
+  default:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1400
