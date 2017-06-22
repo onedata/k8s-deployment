@@ -16,15 +16,17 @@ fi
 
 helm repo add onedata https://groundnuty.github.io/onedata-charts/
 
+RELEASE_NAME=$RELEASE_NAME
 # Clear the namespace
 echo "Removing previous deployment"
-landscaper apply --namespace $NAMESPACE --no-prefix --dir /landscapes/
+#landscaper apply --namespace $NAMESPACE --no-prefix --dir /landscapes/
+helm delete --purge $RELEASE_NAME
 helm search cross
 helm search onedata
 
 
 echo "Starting to wait for all pods except for oneprovider to exit"
-while kubectl -n $NAMESPACE get pods -o name | grep '\-oneprovider' ; do
+while kubectl -n $NAMESPACE get pods -o name | grep -v '\-oneprovider' ; do
   sleep 1 ;
   echo -n "Waiting for all pods except oneproviders to exit"
 done
