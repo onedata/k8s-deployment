@@ -3,11 +3,12 @@ version: '3'
 services:
   landscaper:
     image: groundnuty/landscaper:1.0.6-rc.1-kubectl
-    entrypoint: /entrypoint.sh
+    entrypoint: sleep 
+    command: "1000"
     volumes:
-      - ./entrypoint.sh:/entrypoint.sh:ro
+      - /docker/:/docker:ro
       - ${KUBE_CONFIG}:/root/.kube/config:ro
-      - ../landscapes:/landscapes:ro
+      - /landscapes:/landscapes:ro
     environment:
       NAMESPACE: "$NAMESPACE"
       OZ_IMAGE: "$OZ_IMAGE"
