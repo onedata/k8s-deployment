@@ -16,14 +16,17 @@ fi
 
 helm repo add onedata https://groundnuty.github.io/onedata-charts/
 
-RELEASE_NAME=$RELEASE_NAME
-# Clear the namespace
-echo "Removing previous deployment"
-#landscaper apply --namespace $NAMESPACE --no-prefix --dir /landscapes/
-helm delete --purge $RELEASE_NAME
-helm search cross
-helm search onedata
-
+if [[ $RELEASE_NAME != "" ]] ; then
+  RELEASE_NAME=$RELEASE_NAME
+  # Clear the namespace
+  echo "Removing previous deployment"
+  #landscaper apply --namespace $NAMESPACE --no-prefix --dir /landscapes/
+  helm delete --purge $RELEASE_NAME
+  helm search cross
+  helm search onedata
+else
+  echo "No RELEASE_NAME specified, no cleaning of previous releases is done"
+fi
 
 echo "Starting to wait for all pods except for oneprovider to exit"
 while kubectl -n $NAMESPACE get pods -o name | grep -v '\-oneprovider' ; do
