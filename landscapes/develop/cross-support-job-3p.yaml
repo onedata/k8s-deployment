@@ -97,6 +97,8 @@ onedata-3p:
     image: *oz_image
     onepanel_batch_mode_enabled: *onepanel_batch_mode_enabled
     log_level: *log_level
+    cpu: 1.5
+    memory: 3Gi
 
   # What follows are the providers configurations for providers designated as:
   # krakow, paris, and lisbon
@@ -113,6 +115,9 @@ onedata-3p:
     onezone_service_url:
       type: auto-generate
       disableSuffix: true
+
+    cpu: 1.5
+    memory: 3Gi
 
     oneclient:
       image: *oc_image
@@ -149,6 +154,9 @@ onedata-3p:
       type: auto-generate
       disableSuffix: true
 
+    cpu: 1.5
+    memory: 3Gi
+
     oneclient:
       image: *oc_image
       debug_mode: false
@@ -183,6 +191,9 @@ onedata-3p:
     onezone_service_url:
       type: auto-generate
       disableSuffix: true
+
+    cpu: 1.5
+    memory: 3Gi
 
     oneclient:
       image: *oc_image
