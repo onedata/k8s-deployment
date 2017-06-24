@@ -181,7 +181,7 @@ onedata-3p:
   oneprovider-lisbon:
     suffix: &op3s lisbon
     geoLatitude: 38.7223
-    geoLongitude: 9.1393
+    geoLongitude: -9.1393
 
     image: *op_image
     onepanel_batch_mode_enabled: *onepanel_batch_mode_enabled
