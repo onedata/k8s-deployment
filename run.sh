@@ -58,7 +58,6 @@ main() {
   helm_debug=""
   helm_dry_run=""
   generate_tmuxp=0
-  helm_local=0
   helm_local_dir="~/.helm"
   helm_local_charts_dir=""
   landscape=develop
@@ -109,9 +108,6 @@ main() {
               ;;
           --tmuxp)
               generate_tmuxp=1
-              ;;
-          --helm-local)
-              helm_local=1
               ;;
           --helm-local-dir)
               helm_local_dir=$2
@@ -166,7 +162,7 @@ main() {
 
     docker_compose_dir="docker/"
     local_copy_of_docker_compose_yaml=$(cat $docker_compose_dir/docker-compose.yaml)
-    if [[ helm_local_charts_dir != "" ]]; then
+    if [[ $helm_local_charts_dir != "" ]]; then
         local_copy_of_docker_compose_yaml=$(echo "$local_copy_of_docker_compose_yaml" | sed  -e 's#volumes:#volumes:\n      - ${helm_local_dir}:/root/.helm_ro:ro#g')
         local_copy_of_docker_compose_yaml=$(echo "$local_copy_of_docker_compose_yaml" | sed  -e 's#volumes:#volumes:\n      - ${helm_local_charts_dir}:/root/charts:ro#g')
     fi 
