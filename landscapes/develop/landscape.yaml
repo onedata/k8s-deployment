@@ -83,7 +83,7 @@ onedata-3p:
   cli_image: &cli_image onedata/rest-cli:3.0.0-rc16
 
   log_level: &log_level "info"
-  onepanel_batch_mode_enabled: &onepanel_batch_mode_enabled false
+  onepanel_batch_mode_enabled: &onepanel_batch_mode_enabled true
 
   oneclients_enabled: &oneclients_enabled true
   onedata_cli_enabled: &onedata_cli_enabled true
