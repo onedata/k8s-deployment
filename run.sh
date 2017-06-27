@@ -88,7 +88,7 @@ main() {
               image_prefix=$2
               shift
               ;;            
-          --kube-cofig)
+          --kube-config)
               kube_config=$2
               shift
               ;;
