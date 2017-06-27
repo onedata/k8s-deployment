@@ -1,0 +1,87 @@
+session_name: ${kube_user}/{$landscape}/${namespace}/${release_name}
+windows:
+- window_name: oneproviders-htop
+  layout: even-vertical
+  shell_command_before:
+    - export release_name=$release_name
+  panes:
+    - shell_command:
+        - export PROVIDER_ID=-krakow
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) bash
+        - apt update
+        - apt install -y htop
+        - export TERM=xterm
+        - htop
+    - shell_command:
+        - export PROVIDER_ID=-paris
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) bash
+        - apt update
+        - apt install -y htop
+        - export TERM=xterm
+        - htop
+    - shell_command:
+        - export PROVIDER_ID=-lisbon
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) bash
+        - apt update
+        - apt install -y htop
+        - export TERM=xterm
+        - htop
+
+- window_name: oneproviders
+  layout: even-horizontal
+  shell_command_before:
+    - export release_name=$release_name
+  panes:
+    - shell_command:
+        - export PROVIDER_ID=-krakow
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) bash
+        - pkill  -f "/usr/lib/op_worker/erts-8.2/bin/to_erl /tmp/op_worker/"
+        - op_worker attach-direct
+    - shell_command:
+        - export PROVIDER_ID=-paris
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) bash
+        - pkill  -f "/usr/lib/op_worker/erts-8.2/bin/to_erl /tmp/op_worker/"
+        - op_worker attach-direct
+    - shell_command:
+        - export PROVIDER_ID=-lisbon
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) bash
+        - pkill  -f "/usr/lib/op_worker/erts-8.2/bin/to_erl /tmp/op_worker/"
+        - op_worker attach-direct
+
+- window_name: oneclinets
+  layout: even-horizontal
+  #options:
+  #  synchronize-panes: on
+  shell_command_before:
+    - export release_name=$release_name
+  panes:
+    - shell_command:
+        - export ONECLINET_ID=-krakow
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneclient${ONECLINET_ID},release=${release_name}" -o name | cut -d '/' -f 2) bash
+        - export ID=krakow
+        - naive() { apt install -y git python3 python3-pip ; pip3 install humanize ; git -C / clone https://github.com/bkryza/naive-bench.git ; }
+        - alias bench="/naive-bench/naive-bench.py -f 1000 -s 1MB -b 512KB -t 5 -F -c"
+        - alias ctf="echo $ONECLIENT_PROVIDER_HOST > $ID"
+        - export PS1="${debian_chroot:+($debian_chroot)}\u@\h[$ID]:\w\$"
+        - cd /mnt/oneclient
+        - ls -l
+    - shell_command:
+        - export ONECLIENT_ID=-paris
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneclient${ONECLIENT_ID},release=${release_name}" -o name | cut -d '/' -f 2) bash
+        - export ID=paris
+        - naive() { apt install -y git python3 python3-pip ; pip3 install humanize ; git -C / clone https://github.com/bkryza/naive-bench.git ; }
+        - alias bench="/naive-bench/naive-bench.py -f 1000 -s 1MB -b 512KB -t 5 -F -c"
+        - alias ctf="echo $ONECLIENT_PROVIDER_HOST > $ID"
+        - export PS1="${debian_chroot:+($debian_chroot)}\u@\h[$ID]:\w\$"
+        - cd /mnt/oneclient
+        - ls -l
+    - shell_command:
+        - export ONECLIENT_ID=-lisbon
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneclient${ONECLIENT_ID},release=${release_name}" -o name | cut -d '/' -f 2) bash
+        - export ID=lisbon
+        - naive() { apt install -y git python3 python3-pip ; pip3 install humanize ; git -C / clone https://github.com/bkryza/naive-bench.git ; }
+        - alias bench="/naive-bench/naive-bench.py -f 1000 -s 1MB -b 512KB -t 5 -F -c"
+        - alias ctf="echo $ONECLIENT_PROVIDER_HOST > $ID"
+        - export PS1="${debian_chroot:+($debian_chroot)}\u@\h[$ID]:\w\$"
+        - cd /mnt/oneclient
+        - ls -l
