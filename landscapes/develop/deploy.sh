@@ -2,11 +2,21 @@
 
 # This file specifies a chart, chart version, release name, and a file from where take variables from
 
-cat landscapes/develop/cross-support-job-3p.yaml
+chart_to_deploy="onedata/cross-support-job-3p"
+version="0.2.1"
 
-if [[ $RELEASE_NAME != "" ]]; then
-    RELEASE_NAME="-n $RELEASE_NAME"
+if [[ $release_name != "" ]]; then
+    release_name="-n $release_name"
 fi
 
-echo helm install --dry-run --debug --namespace $NAMESPACE $RELEASE_NAME -f /root/landscapes/develop/cross-support-job-3p.yaml onedata/cross-support-job-3p --version 0.2.0
-helm install --wait --timeout 480 --debug --namespace $NAMESPACE $RELEASE_NAME -f /root/landscapes/develop/cross-support-job-3p.yaml onedata/cross-support-job-3p --version 0.2.0
+if [[ $helm_dry_run != "" ]]; then
+    helm_dry_run="--dry-run"
+fi
+
+if [[ $helm_debug != "" ]]; then
+    helm_debug="--debug"
+fi
+
+echo helm install --wait $helm_dry_run --timeout 480 $helm_debug --namespace $namespace $release_name -f ~/landscapes/$landscape/landscape.yaml "$chart_to_deploy" --version $version
+cat ~/landscapes/$landscape/landscape.yaml
+helm install --wait $helm_dry_run --timeout 480 $helm_debug --namespace $namespace $release_name -f ~/landscapes/$landscape/landscape.yaml "$chart_to_deploy" --version $version

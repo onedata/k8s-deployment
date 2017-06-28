@@ -62,6 +62,19 @@ spaces:
       - provider: "lisbon"
         storage_name: "nfs"
         size: '1000000000'
+  - name: "krk-g"
+    supports:
+      - provider: "krakow"
+        storage_name: "gluster"
+        size: '1000000000' 
+  - name: "krk-g-par-3"
+    supports:
+      - provider: "krakow"
+        storage_name: "gluster"
+        size: '1000000000'
+      - provider: "paris"
+        storage_name: "ceph"
+        size: '1000000000'
 
 onedata-3p: 
   oz_image: &oz_image onedata/onezone:3.0.0-rc16
@@ -74,10 +87,12 @@ onedata-3p:
 
   oneclients_enabled: &oneclients_enabled true
   onedata_cli_enabled: &onedata_cli_enabled true
+  oneclients_debug_mode_enabled: &oneclients_debug_mode_enabled true
 
   s3_enabled: &s3_enabled true
   ceph_enabled: &ceph_enabled true
   nfs_enabled: &nfs_enabled true
+  gluster_enabled: &gluster_enabled true
 
   # Those variables are the unfortunate necessity of an issue discussed here:
   # https://github.com/kubernetes/helm/issues/2479
@@ -91,14 +106,14 @@ onedata-3p:
     enabled: *ceph_enabled
   volume-nfs:
     enabled: *nfs_enabled
+  volume-gluster:
+    enabled: *gluster_enabled
 
   # Onezone configuration
   onezone:
     image: *oz_image
     onepanel_batch_mode_enabled: *onepanel_batch_mode_enabled
     log_level: *log_level
-    cpu: 1.5
-    memory: 3Gi
 
   # What follows are the providers configurations for providers designated as:
   # krakow, paris, and lisbon
@@ -116,12 +131,9 @@ onedata-3p:
       type: auto-generate
       disableSuffix: true
 
-    cpu: 1.5
-    memory: 3Gi
-
     oneclient:
       image: *oc_image
-      debug_mode: false
+      debug_mode: *oneclients_debug_mode_enabled 
       enabled: *oneclients_enabled
       suffix: *op1s
       onedata_cli:
@@ -138,6 +150,9 @@ onedata-3p:
       suffix: *op1s
     volume-nfs:
       enabled: *nfs_enabled
+      suffix: *op1s
+    volume-gluster:
+      enabled: *gluster_enabled
       suffix: *op1s
 
   oneprovider-paris:
@@ -154,12 +169,9 @@ onedata-3p:
       type: auto-generate
       disableSuffix: true
 
-    cpu: 1.5
-    memory: 3Gi
-
     oneclient:
       image: *oc_image
-      debug_mode: false
+      debug_mode: *oneclients_debug_mode_enabled 
       enabled: *oneclients_enabled
       suffix: *op2s
       onedata_cli:
@@ -176,6 +188,9 @@ onedata-3p:
       suffix: *op2s
     volume-nfs:
       enabled: *nfs_enabled
+      suffix: *op2s
+    volume-gluster:
+      enabled: *gluster_enabled
       suffix: *op2s
 
   oneprovider-lisbon:
@@ -192,11 +207,9 @@ onedata-3p:
       type: auto-generate
       disableSuffix: true
 
-    cpu: 1.5
-    memory: 3Gi
-
     oneclient:
       image: *oc_image
+      debug_mode: *oneclients_debug_mode_enabled 
       enabled: *oneclients_enabled
       suffix: *op3s
       onedata_cli:
@@ -213,4 +226,7 @@ onedata-3p:
       suffix: *op3s
     volume-nfs:
       enabled: *nfs_enabled
+      suffix: *op3s
+    volume-gluster:
+      enabled: *gluster_enabled
       suffix: *op3s
