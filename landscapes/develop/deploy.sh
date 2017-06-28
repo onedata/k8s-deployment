@@ -18,7 +18,5 @@ if [[ $helm_debug != "" ]]; then
 fi
 
 echo helm install --wait $helm_dry_run --timeout 480 $helm_debug --namespace $namespace $release_name -f ~/landscapes/$landscape/landscape.yaml "$chart_to_deploy" --version $version
-
 cat ~/landscapes/$landscape/landscape.yaml
-echo ""
 helm install --wait $helm_dry_run --timeout 480 $helm_debug --namespace $namespace $release_name -f ~/landscapes/$landscape/landscape.yaml "$chart_to_deploy" --version $version
