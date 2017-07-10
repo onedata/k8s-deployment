@@ -94,6 +94,9 @@ onedata-3p:
   nfs_enabled: &nfs_enabled true
   gluster_enabled: &gluster_enabled true
 
+  # Explicately wait for onezone pod to enter ready state before starting oneproviders
+  wait-for-onezone-enabled: &wait-for-onezone-enabled true
+
   # Those variables are the unfortunate necessity of an issue discussed here:
   # https://github.com/kubernetes/helm/issues/2479
   oneclient:
@@ -126,6 +129,7 @@ onedata-3p:
     onepanel_batch_mode_enabled: *onepanel_batch_mode_enabled
     log_level: *log_level
     nameOverride: oneprovider
+    wait-for-onezone: *wait-for-onezone-enabled
 
     onezone_service_url:
       type: auto-generate
@@ -164,6 +168,7 @@ onedata-3p:
     onepanel_batch_mode_enabled: *onepanel_batch_mode_enabled
     log_level: *log_level
     nameOverride: oneprovider
+    wait-for-onezone: *wait-for-onezone-enabled
 
     onezone_service_url:
       type: auto-generate
@@ -202,6 +207,7 @@ onedata-3p:
     onepanel_batch_mode_enabled: *onepanel_batch_mode_enabled
     log_level: *log_level
     nameOverride: oneprovider
+    wait-for-onezone: *wait-for-onezone-enabled
 
     onezone_service_url:
       type: auto-generate
