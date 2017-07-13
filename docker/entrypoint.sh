@@ -20,7 +20,7 @@ if [[ "$namespace" == "" ]]; then
   namespace=$(kubectl config get-contexts 2>&1 | grep -e "^\*" | tr -s ' ' |   cut -d ' '  -f 5)
 fi
 
-helm repo add onedata https://groundnuty.github.io/onedata-charts/
+helm repo add onedata https://onedata.github.io/charts/
 
 if [[ $release_name != "" ]] ; then
   release_name=$release_name
