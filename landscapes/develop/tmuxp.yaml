@@ -36,16 +36,19 @@ windows:
   panes:
     - shell_command:
         - export PROVIDER_ID=-krakow
+        - kubectl port-forward -n $namespace $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) 18091:8091 &
         - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) bash
         - pkill  -f "/usr/lib/op_worker/erts-8.2/bin/to_erl /tmp/op_worker/"
         - op_worker attach-direct
     - shell_command:
         - export PROVIDER_ID=-paris
+        - kubectl port-forward -n $namespace $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) 28091:8091 &
         - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) bash
         - pkill  -f "/usr/lib/op_worker/erts-8.2/bin/to_erl /tmp/op_worker/"
         - op_worker attach-direct
     - shell_command:
         - export PROVIDER_ID=-lisbon
+        - kubectl port-forward -n $namespace $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) 38091:8091 &
         - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) bash
         - pkill  -f "/usr/lib/op_worker/erts-8.2/bin/to_erl /tmp/op_worker/"
         - op_worker attach-direct
