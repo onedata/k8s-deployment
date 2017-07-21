@@ -1,5 +1,23 @@
 #!/usr/bin/env bash
 
+command_exists() {
+  command -v "$@" > /dev/null 2>&1
+}
+
+check_requirement() {
+  if ! command_exists "$@" ; then
+    echo "Cannot find command: $*"
+    echo "Please install it and rerun the script."
+    return 1
+  fi   
+}
+
+check_requirements() {
+  for requirement in "$@" ; do
+    check_requirement "$requirement" || exit 1
+  done
+}
+
 usage() {
 cat <<EOF
 This script deploys a landscape and allows for overriding docker images: 
@@ -47,6 +65,8 @@ main() {
   if (( ! $# )); then
     usage
   fi
+
+  check_requirements docker docker-compose curl jq tmux tmuxp
 
   kube_config=""
   namespace=""
