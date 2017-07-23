@@ -62,3 +62,7 @@ By default the name includes all possible flags `cidk`, where:
 - **k** stands for, if the tmux session exists with the conflicting name, **kill** it
 - **d** add **detach** flag to *tmuxp* command, prevents automatic attach to tmux
 - **i** stands for, attach to the tmux session using iTerm integration.
+
+### onedata-envat
+
+Similarly to the method above, this script allows you to attach to a deployed release using tmux. This time, the release parameters can be supplied as flags and the script can be used either from the root of this repository or by placing symbolic link to in somewhere in your `$PATH`. See `-h` for a more detailed description of possible flags.
