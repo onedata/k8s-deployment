@@ -78,7 +78,7 @@ main() {
   helm_debug=""
   helm_dry_run=""
   generate_tmuxp=0
-  helm_local_dir="~/.helm"
+  helm_local_dir=""
   helm_local_charts_dir=""
   landscape=develop
   
@@ -158,8 +158,9 @@ main() {
       shift
   done
 
-    if [[ -z $kube_config ]] ; then kube_config=~/.kube/config ; fi
-
+    if [[ -z $kube_config ]] ; then kube_config="~/.kube/config" ; fi
+    if [[ -z $helm_local_dir ]] ; then helm_local_dir="~/.helm" ; fi
+    
     export kube_config="$kube_config"
     export namespace=$namespace
     export release_name=$release_name
