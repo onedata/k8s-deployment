@@ -31,12 +31,12 @@ Options:
   --dry-run                  pass --dry-run flag to helm
   --kube-config              path you for kubectl config file, defaults to ~/.kube/config
   --tmuxp                    generate tmuxp configuration to access the deployment
-  --helm-local-charts-dir    path a direcotry with you local onedata charts
-  --helm-local-dir           path you for kubectl config file, defaults to ~/.kube/config
+  --helm-local-charts-dir    path a directory with you local onedata charts
+  --helm-local-dir           path you for helm config directory, defaults to ~/.helm
   --landscape                name of a directory in landscapes directory you want to use, defaults to develop
   --rn                       helm release name 
   --ns                       namespace to deploy into
-  --prefix                   prefix to be prepended to all overriden images
+  --prefix                   prefix to be prepended to all overridden images
   --oz                       onezone docker image
   --op                       oneprovider docker image
   --oc                       oneclient docker image
