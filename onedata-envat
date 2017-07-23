@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+
+run_sh_path=""
+
+usage() {
+cat <<EOF
+This script allows you to attach with tmux(p) to a deployed helm release:
+
+${0##*/} [-h | --help] [-r <namespace>] [-l <landscape>] <release name>
+
+<release name> - helm release name
+
+Options:
+  -l        name of a directory in landscapes directory you want to use, defaults to release name
+  -n        k8s namespace to use, defaults to release name
+  -h        print this message
+
+Following examples are equivalent:
+Example:
+${0##*/} develop
+${0##*/} -n develop -l develop develop
+EOF
+exit 1
+}
+
+check_run_sh_on_path() {
+
+  # Check if run.sh exists in the same dir as this script
+  if [[ -x ${0%/*}/run.sh ]] ; then
+    run_sh_path="${0%/*}/"
+    echo $run_sh_path
+    return 0
+  fi
+
+  # Check if this executable is a symbolic link
+  if [[ -L $0 ]]; then
+    script_name=${0##*/}
+    script_home="$(readlink $0)"
+    # Check if run.sh exists in the same dir the target of the link and is executable
+    if [[ -x ${script_home%$script_name}run.sh ]] ; then
+      run_sh_path="${script_home%$script_name}"
+      return 0
+    fi 
+  fi
+
+  if [[ $run_sh_path == "" ]] ; then
+    echo "Error: Cannot locate run.sh and the k8s-deployment repository".
+    exit 1
+  fi
+}
+
+main() {
+
+  check_run_sh_on_path 
+
+  if (( ! $# )); then
+    usage
+  fi
+
+  namespace=""
+  release_name=""
+  landscape=""
+  
+  last_argument_seen=false
+  while (( $# )); do
+      case $1 in
+          ([!-]*)  # if not starting with - assume it's the mandatory argument
+              $last_argument_seen && printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2 && usage
+              release_name=$1
+              last_argument_seen=true
+              ;;
+          -h|-\?|--help)   # Call a "usage" function to display a synopsis, then exit.
+              usage
+              exit 0
+              ;;
+          -l)
+              landscape=$2
+              $last_argument_seen && printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2 && usage
+              shift
+              ;;
+          -n)
+              namespace=$2
+              $last_argument_seen && printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2 && usage
+              shift
+              ;;
+          -?*)
+              printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
+              exit 1
+              ;;
+          *)
+              echo "no option $1"
+              exit 1
+              ;;
+      esac
+      shift
+  done
+
+  if [[ "$release_name" == "" ]] ; then
+    printf 'WARN: Missing mandatory argument <release name>\n'
+    usage
+  fi
+
+  # Everything defaults to develop
+  [[ "$namespace" == "" ]] && namespace="develop"
+  [[ "$landscape" == "" ]] && landscape="develop"
+
+  # TODO: a dirty hack to be compatible with an existing tool
+  bash -c "source ${run_sh_path}utils/run_tmuxp.sh ; cd "$run_sh_path" ; main " "tmuxp.$landscape.$namespace.$release_name.cidk.sh"
+}
+
+main "$@"
