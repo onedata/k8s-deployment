@@ -68,7 +68,15 @@ windows:
         - naive() { apt install -y git python3 python3-pip ; pip3 install humanize ; git -C / clone https://github.com/bkryza/naive-bench.git ; }
         - alias bench="/naive-bench/naive-bench.py -f 1000 -s 1MB -b 512KB -t 5 -F -c"
         - alias ctf="echo $ONECLIENT_PROVIDER_HOST > $ID"
-        - export PS1="${debian_chroot:+($debian_chroot)}\u@\h[$ID]:\w\$ "
+        # < Begining of a custom prompt >
+        - function timer_start { timer=${timer:-$SECONDS} ; }
+        - function timer_stop { timer_show=$(($SECONDS - $timer)) ; unset timer ; }
+        - export ES=""
+        - function exit_status { local EXIT="$?" ; [ $EXIT != 0 ] && ES="[exit':' $EXIT]" || ES="" ; }
+        - trap 'timer_start' DEBUG
+        - export PROMPT_COMMAND="exit_status; timer_stop;"
+        - export PS1='\[\e[1;33m\][\t]${debian_chroot:+($debian_chroot)}\u@\h:\w\n\[\e[1;36m\][last':' ${timer_show}s][$ID]\[\e[m\]\[\e[0;31m\]$ES\[\e[0m\]$ '
+        # < End of  a custom prompt >
         - cd /mnt/oneclient
         - ls -l
     - shell_command:
@@ -78,7 +86,15 @@ windows:
         - naive() { apt install -y git python3 python3-pip ; pip3 install humanize ; git -C / clone https://github.com/bkryza/naive-bench.git ; }
         - alias bench="/naive-bench/naive-bench.py -f 1000 -s 1MB -b 512KB -t 5 -F -c"
         - alias ctf="echo $ONECLIENT_PROVIDER_HOST > $ID"
-        - export PS1="${debian_chroot:+($debian_chroot)}\u@\h[$ID]:\w\$ "
+        # < Begining of a custom prompt >
+        - function timer_start { timer=${timer:-$SECONDS} ; }
+        - function timer_stop { timer_show=$(($SECONDS - $timer)) ; unset timer ; }
+        - export ES=""
+        - function exit_status { local EXIT="$?" ; [ $EXIT != 0 ] && ES="[exit':' $EXIT]" || ES="" ; }
+        - trap 'timer_start' DEBUG
+        - export PROMPT_COMMAND="exit_status; timer_stop;"
+        - export PS1='\[\e[1;33m\][\t]${debian_chroot:+($debian_chroot)}\u@\h:\w\n\[\e[1;36m\][last':' ${timer_show}s][$ID]\[\e[m\]\[\e[0;31m\]$ES\[\e[0m\]$ '
+        # < End of  a custom prompt >
         - cd /mnt/oneclient
         - ls -l
     - shell_command:
@@ -88,6 +104,14 @@ windows:
         - naive() { apt install -y git python3 python3-pip ; pip3 install humanize ; git -C / clone https://github.com/bkryza/naive-bench.git ; }
         - alias bench="/naive-bench/naive-bench.py -f 1000 -s 1MB -b 512KB -t 5 -F -c"
         - alias ctf="echo $ONECLIENT_PROVIDER_HOST > $ID"
-        - export PS1="${debian_chroot:+($debian_chroot)}\u@\h[$ID]:\w\$ "
+        # < Begining of a custom prompt >
+        - function timer_start { timer=${timer:-$SECONDS} ; }
+        - function timer_stop { timer_show=$(($SECONDS - $timer)) ; unset timer ; }
+        - export ES=""
+        - function exit_status { local EXIT="$?" ; [ $EXIT != 0 ] && ES="[exit':' $EXIT]" || ES="" ; }
+        - trap 'timer_start' DEBUG
+        - export PROMPT_COMMAND="exit_status; timer_stop;"
+        - export PS1='\[\e[1;33m\][\t]${debian_chroot:+($debian_chroot)}\u@\h:\w\n\[\e[1;36m\][last':' ${timer_show}s][$ID]\[\e[m\]\[\e[0;31m\]$ES\[\e[0m\]$ '
+        # < End of  a custom prompt >
         - cd /mnt/oneclient
         - ls -l
