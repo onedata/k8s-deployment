@@ -2,13 +2,15 @@ version: '3'
 
 services:
   landscaper:
-    image: groundnuty/landscaper:1.0.6-rc.1-kubectl
+    image: onedata/landscaper:v2.5.0-1
     entrypoint: /entrypoint.sh
     volumes:
+      -  /etc/localtime:/etc/localtime:ro
       - ./entrypoint.sh:/entrypoint.sh:ro
       - ${kube_config}:/root/.kube/config:ro
-      - ../landscapes:/landscapes:ro
+      - ../../landscapes:/landscapes:ro
     environment:
+      TZ: "CEST-1CEST" # timezone for proper date in CEST
       namespace: "$namespace"
       oz_image: "$oz_image"
       op_image: "$op_image"
@@ -18,6 +20,8 @@ services:
       helm_debug: "$helm_debug"
       helm_dry_run: "$helm_dry_run"
       landscape: "$landscape"
+      user: "$user"
+      lifetime: "$lifetime"
 
 # Needed to work in Cyfronet
 networks:

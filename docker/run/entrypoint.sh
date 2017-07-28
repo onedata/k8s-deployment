@@ -80,3 +80,12 @@ export helm_debug=$helm_debug
 export landscape=$landscape
 
 /root/landscapes/$landscape/deploy.sh
+
+# Set time when this build can be garbage collected
+deathtime=$(date +"%a_%b_%d_%H-%M-%S_%Y_%Z" @$(( `date +%s`+3600*${lifetime} )))
+echo "Setting label deathtime=$deathtime on this release"
+kubectl -n kube-system label cm -lNAME=$release_name  deathtime="$deathtime" --overwrite
+
+# Set release owner
+echo "Setting label release-owner="$user" on this release"
+kubectl -n kube-system label cm -lNAME=$release_name  release-owner="$user" --overwrite

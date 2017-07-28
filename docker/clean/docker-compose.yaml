@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  landscaper:
+    image: onedata/landscaper:v2.5.0-1
+    entrypoint: /entrypoint.sh
+    volumes:
+      - ./entrypoint.sh:/entrypoint.sh:ro
+      - ${kube_config}:/root/.kube/config:ro
+    environment:
+      TZ: "CEST-1CEST" # timezone for proper date in CEST
+      dry_run: "$dry_run"
+
+# Needed to work in Cyfronet
+networks:
+  default:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1400

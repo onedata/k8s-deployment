@@ -34,6 +34,8 @@ Options:
   --helm-local-charts-dir    path a directory with you local onedata charts
   --helm-local-dir           path you for helm config directory, defaults to ~/.helm
   --landscape                name of a directory in landscapes directory you want to use, defaults to develop
+  --lifetime                 number or hours ([1-9][0-9]*), after which this deployment will be scheduled for deletion
+  --user                     set owner of this release (defaults to $USER)
   --rn                       helm release name 
   --ns                       namespace to deploy into
   --prefix                   prefix to be prepended to all overridden images
@@ -81,7 +83,10 @@ main() {
   helm_local_dir=""
   helm_local_charts_dir=""
   landscape=develop
-  
+  lifetime=12
+  lifetime_set=false
+  user=$USER
+
   while (( $# )); do
       case $1 in
           -h|-\?|--help)   # Call a "usage" function to display a synopsis, then exit.
@@ -145,6 +150,15 @@ main() {
               landscape=$2
               shift
               ;;
+          --lifetime)
+              lifetime=$2
+              lifetime_set=true
+              shift
+              ;;
+          --user)
+              user=$2
+              shift
+              ;;
           --debug)
               ;;
           -?*)
@@ -173,6 +187,8 @@ main() {
     export helm_local_dir=$helm_local_dir
     export helm_local_charts_dir=$helm_local_charts_dir
     export landscape=$landscape
+    export user=$user
+    export lifetime=$lifetime
 
     type docker-compose >/dev/null 2>&1 || {
         echo >&2 "I require docker-compose but it's not installed. Downloading..." ;
@@ -181,7 +197,7 @@ main() {
         export PATH=$PATH:.
     }
 
-    docker_compose_dir="docker/"
+    docker_compose_dir="docker/run/"
     local_copy_of_docker_compose_yaml=$(cat $docker_compose_dir/docker-compose.yaml)
     if [[ $helm_local_charts_dir != "" ]]; then
         local_copy_of_docker_compose_yaml=$(echo "$local_copy_of_docker_compose_yaml" | sed  -e 's#volumes:#volumes:\n      - ${helm_local_dir}:/root/.helm_ro:ro#g')
@@ -211,6 +227,14 @@ EOF
 
     if [[ -f docker-compose ]]; then
         rm docker-compose
+    fi
+
+    if $lifetime_set ; then
+      echo ""
+      echo "INFO: Your deployment will be scheduled for automatic deletion within $lifetime hours!"  
+    else
+      echo ""
+      echo "" && echo "WARNING: You did not specify --lifetime, your deployment will be scheduled for automatic deletion within 12 hours!"
     fi
 }
 
