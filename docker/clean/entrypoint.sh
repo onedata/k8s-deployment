@@ -32,7 +32,7 @@ while read release_name deathtime ; do
 
       echo "Terminating all remaining pods"
       # TODO: NFS makes it impossible for provider pods to terminate normally
-      kubectl -n $namespace get pod  | grep Terminating | cut -d ' ' -f 1 | xargs -I{}  kubectl -n $namespace delete  --grace-period=0 --force pod  {}
+      kubectl get pods --all-namespaces | grep Terminating | tr -s ' ' | cut -d ' ' -f1,2 | while read namespace pod ; do kubectl -n $namespace delete  --grace-period=0 --force pod $pod ; done
     fi
   else
     echo "Release $release_name may live, deathtime set to $deathtime."
