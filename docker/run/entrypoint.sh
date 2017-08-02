@@ -25,9 +25,14 @@ helm repo add onedata https://onedata.github.io/charts/
 if [[ $release_name != "" ]] ; then
   release_name=$release_name
   # Clear the namespace
-  echo "Removing previous deployment: $release_name"
-  #landscaper apply --namespace $namespace --no-prefix --dir /landscapes/
-  helm delete --purge $release_name
+  release_present=$(helm ls $release_name)
+  if [[ "$release_present" != "" ]]; then
+    echo "Removing previous deployment: $release_name"
+    #landscaper apply --namespace $namespace --no-prefix --dir /landscapes/
+    helm delete --purge $release_name
+  else
+    echo "Release $release_name does not exist."
+  fi
   helm search cross
   helm search onedata
 else
