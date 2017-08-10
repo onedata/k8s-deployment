@@ -195,11 +195,11 @@ onedata-3p:
     nameOverride: oneprovider
     wait-for-onezone: *wait-for-onezone-enabled
 
-    oneprovider_nodes_count: 3
+    oneprovider_nodes_count: 1
     cluster_config:
-      managers: [ 0 ]
-      workers: [ 0, 1 ]
-      databases: [ 2 ]
+      managers: [ ]
+      workers: [ ]
+      databases: [ ]
 
     onezone_service_url:
       type: auto-generate
