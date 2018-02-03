@@ -67,14 +67,56 @@ spaces:
       - provider: "krakow"
         storage_name: "gluster"
         size: '1000000000' 
-  - name: "krk-g-par-3"
+  - name: "krk-iu"
     supports:
       - provider: "krakow"
-        storage_name: "gluster"
-        size: '1000000000'
+        storage_name: "IdealNullStorage"
+        size: '100125899906840000000000000'
+  - name: "par-su"
+    supports:
       - provider: "paris"
-        storage_name: "ceph"
-        size: '1000000000'
+        storage_name: "SlowNullStorage"
+        size: '100125899906840000000000000'
+  - name: "par-bu"
+    supports:
+      - provider: "paris"
+        storage_name: "BusyNullStorage"
+        size: '100125899906840000000000000'
+  - name: "lis-bu-par-bu-krk-bu"
+    supports:
+      - provider: "lisbon"
+        storage_name: "BusyNullStorage"
+        size: '100125899906840000000000000'
+      - provider: "paris"
+        storage_name: "BusyNullStorage"
+        size: '100125899906840000000000000'
+      - provider: "krakow"
+        storage_name: "BusyNullStorage"
+        size: '100125899906840000000000000'
+  - name: "lis-iu-par-iu-krk-iu"
+    supports:
+      - provider: "lisbon"
+        storage_name: "IdealNullStorage"
+        size: '100125899906840000000000000'
+      - provider: "paris"
+        storage_name: "IdealNullStorage"
+        size: '100125899906840000000000000'
+      - provider: "krakow"
+        storage_name: "IdealNullStorage"
+        size: '100125899906840000000000000'
+  - name: "lis-su-par-su-krk-su"
+    supports:
+      - provider: "lisbon"
+        storage_name: "SlowNullStorage"
+        size: '100125899906840000000000000'
+      - provider: "paris"
+        storage_name: "SlowNullStorage"
+        size: '100125899906840000000000000'
+      - provider: "krakow"
+        storage_name: "SlowNullStorage"
+        size: '100125899906840000000000000'
+
+
 
 # Those variables are the unfortunate necessity of an issue discussed here:
 # https://github.com/kubernetes/helm/issues/2479]
@@ -130,6 +172,31 @@ onedata-3p:
  
   # Explicately wait for onezone pod to enter ready state before starting oneproviders
   wait-for-onezone-enabled: &wait-for-onezone-enabled false
+
+  # External for all providers
+  external-storages: &external-storages
+    IdealNullStorage:
+      type: nulldevice
+      latencyMin: 0
+      latencyMax: 0
+      #timeoutProbability: !!float 0.0
+      insecure: true
+      readonly: true
+    SlowNullStorage:
+      type: nulldevice
+      latencyMin: 25
+      latencyMax: 100
+      #timeoutProbability: !!float 0.0
+      insecure: true
+      readonly: true
+    BusyNullStorage:
+      type: nulldevice
+      latencyMin: 1
+      latencyMax: 10
+      timeoutProbability: !!float 0.3
+      insecure: true
+      readonly: true
+
 
   luma: &luma_global
     enabled: *luma_enabled
@@ -195,11 +262,8 @@ onedata-3p:
     nameOverride: oneprovider
     wait-for-onezone: *wait-for-onezone-enabled
 
-    oneprovider_nodes_count: 1
-    cluster_config:
-      managers: [ ]
-      workers: [ ]
-      databases: [ ]
+    oneprovider_nodes_count: *oneproviders_nodes_count
+    cluster_config: *oneprovider_cluster_configs
 
     onezone_service_url:
       type: auto-generate
@@ -246,6 +310,9 @@ onedata-3p:
       enabled: *swift_enabled
       suffix: *op1s
       luma-enabled: *luma_enabled_swift
+
+    external-storages:
+      << : *external-storages
 
   oneprovider-paris:
     suffix: &op2s paris
@@ -307,6 +374,9 @@ onedata-3p:
       suffix: *op2s
       luma-enabled: *luma_enabled_swift
 
+    external-storages:
+      << : *external-storages
+
   oneprovider-lisbon:
     suffix: &op3s lisbon
     geoLatitude: 38.7223
@@ -366,3 +436,6 @@ onedata-3p:
       enabled: *swift_enabled
       suffix: *op3s
       luma-enabled: *luma_enabled_swift
+
+    external-storages:
+      << : *external-storages
