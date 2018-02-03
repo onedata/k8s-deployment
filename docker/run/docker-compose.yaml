@@ -2,10 +2,10 @@ version: '3'
 
 services:
   landscaper:
-    image: onedata/landscaper:v2.5.0-1
+    image: onedata/landscaper:v2.8.0-2
     entrypoint: /entrypoint.sh
     volumes:
-      -  /etc/localtime:/etc/localtime:ro
+     #  -  /etc/localtime:/etc/localtime:ro
       - ./entrypoint.sh:/entrypoint.sh:ro
       - ${kube_config}:/root/.kube/config:ro
       - ../../landscapes:/landscapes:ro
