@@ -14,22 +14,22 @@ spaces:
     supports:
       - provider: "krakow"
         storage_name: "ceph"
-        size: '1000000000'
+        size: '1073741824'
   - name: "krk-n"
     supports:
       - provider: "krakow"
         storage_name: "nfs"
-        size: '1000000000'
+        size: '1073741824'
   - name: "krk-3"
     supports:
       - provider: "krakow"
         storage_name: "s3"
-        size: '1000000000'
+        size: '1073741824'
   - name: "krk-g"
     supports:
       - provider: "krakow"
         storage_name: "gluster"
-        size: '1000000000'
+        size: '1073741824'
 
 # Those variables are the unfortunate necessity of an issue discussed here:
 # https://github.com/kubernetes/helm/issues/2479]

@@ -16,105 +16,105 @@ spaces:
     supports:
       - provider: "krakow"
         storage_name: "ceph"
-        size: '1000000000'
+        size: '1073741824'
   - name: "par-n"
     supports:
       - provider: "paris"
         storage_name: "nfs"
-        size: '1000000000'
+        size: '1073741824'
   - name: "lis-3"
     supports:
       - provider: "lisbon"
         storage_name: "s3"
-        size: '1000000000'
+        size: '1073741824'
   - name: "krk-n-par-3"
     supports:
       - provider: "krakow"
         storage_name: "nfs"
-        size: '1000000000'
+        size: '1073741824'
       - provider: "paris"
         storage_name: "s3"
-        size: '1000000000'
+        size: '1073741824'
   - name: "krk-3-lis-c"
     supports:
       - provider: "krakow"
         storage_name: "s3"
-        size: '1000000000'
+        size: '1073741824'
       - provider: "lisbon"
         storage_name: "ceph"
-        size: '1000000000'
+        size: '1073741824'
   - name: "par-n-lis-c"
     supports:
       - provider: "paris"
         storage_name: "nfs"
-        size: '1000000000'
+        size: '1073741824'
       - provider: "lisbon"
         storage_name: "ceph"
-        size: '1000000000'
+        size: '1073741824'
   - name: "krk-3-par-c-lis-n"
     supports:
       - provider: "krakow"
         storage_name: "s3"
-        size: '1000000000'
+        size: '1073741824'
       - provider: "paris"
         storage_name: "ceph"
-        size: '1000000000'
+        size: '1073741824'
       - provider: "lisbon"
         storage_name: "nfs"
-        size: '1000000000'
+        size: '1073741824'
   - name: "krk-g"
     supports:
       - provider: "krakow"
         storage_name: "gluster"
-        size: '1000000000' 
+        size: '1073741824' 
   - name: "krk-iu"
     supports:
       - provider: "krakow"
         storage_name: "IdealNullStorage"
-        size: '100125899906840000000000000'
+        size: '1125899906842624'
   - name: "par-su"
     supports:
       - provider: "paris"
         storage_name: "SlowNullStorage"
-        size: '100125899906840000000000000'
+        size: '1125899906842624'
   - name: "par-bu"
     supports:
       - provider: "paris"
         storage_name: "BusyNullStorage"
-        size: '100125899906840000000000000'
+        size: '1125899906842624'
   - name: "lis-bu-par-bu-krk-bu"
     supports:
       - provider: "lisbon"
         storage_name: "BusyNullStorage"
-        size: '100125899906840000000000000'
+        size: '1125899906842624'
       - provider: "paris"
         storage_name: "BusyNullStorage"
-        size: '100125899906840000000000000'
+        size: '1125899906842624'
       - provider: "krakow"
         storage_name: "BusyNullStorage"
-        size: '100125899906840000000000000'
+        size: '1125899906842624'
   - name: "lis-iu-par-iu-krk-iu"
     supports:
       - provider: "lisbon"
         storage_name: "IdealNullStorage"
-        size: '100125899906840000000000000'
+        size: '1125899906842624'
       - provider: "paris"
         storage_name: "IdealNullStorage"
-        size: '100125899906840000000000000'
+        size: '1125899906842624'
       - provider: "krakow"
         storage_name: "IdealNullStorage"
-        size: '100125899906840000000000000'
+        size: '1125899906842624'
   - name: "lis-su-par-su-krk-su"
     supports:
       - provider: "lisbon"
         storage_name: "SlowNullStorage"
-        size: '100125899906840000000000000'
+        size: '1125899906842624'
       - provider: "paris"
         storage_name: "SlowNullStorage"
-        size: '100125899906840000000000000'
+        size: '1125899906842624'
       - provider: "krakow"
         storage_name: "SlowNullStorage"
-        size: '100125899906840000000000000'
+        size: '1125899906842624'
 
 
 
