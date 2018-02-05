@@ -311,8 +311,8 @@ onedata-3p:
       suffix: *op1s
       luma-enabled: *luma_enabled_swift
 
-    external-storages:
-      << : *external-storages
+    #external-storages:
+    #  << : *external-storages
 
   oneprovider-paris:
     suffix: &op2s paris
@@ -374,8 +374,8 @@ onedata-3p:
       suffix: *op2s
       luma-enabled: *luma_enabled_swift
 
-    external-storages:
-      << : *external-storages
+    #external-storages:
+    #  << : *external-storages
 
   oneprovider-lisbon:
     suffix: &op3s lisbon
@@ -437,5 +437,5 @@ onedata-3p:
       suffix: *op3s
       luma-enabled: *luma_enabled_swift
 
-    external-storages:
-      << : *external-storages
+    #external-storages:
+    #  << : *external-storages
