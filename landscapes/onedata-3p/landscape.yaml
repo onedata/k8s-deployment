@@ -67,56 +67,6 @@ spaces:
       - provider: "krakow"
         storage_name: "gluster"
         size: '1000000000' 
-  - name: "krk-iu"
-    supports:
-      - provider: "krakow"
-        storage_name: "IdealNullStorage"
-        size: '100125899906840000000000000'
-  - name: "par-su"
-    supports:
-      - provider: "paris"
-        storage_name: "SlowNullStorage"
-        size: '100125899906840000000000000'
-  - name: "par-bu"
-    supports:
-      - provider: "paris"
-        storage_name: "BusyNullStorage"
-        size: '100125899906840000000000000'
-  - name: "lis-bu-par-bu-krk-bu"
-    supports:
-      - provider: "lisbon"
-        storage_name: "BusyNullStorage"
-        size: '100125899906840000000000000'
-      - provider: "paris"
-        storage_name: "BusyNullStorage"
-        size: '100125899906840000000000000'
-      - provider: "krakow"
-        storage_name: "BusyNullStorage"
-        size: '100125899906840000000000000'
-  - name: "lis-iu-par-iu-krk-iu"
-    supports:
-      - provider: "lisbon"
-        storage_name: "IdealNullStorage"
-        size: '100125899906840000000000000'
-      - provider: "paris"
-        storage_name: "IdealNullStorage"
-        size: '100125899906840000000000000'
-      - provider: "krakow"
-        storage_name: "IdealNullStorage"
-        size: '100125899906840000000000000'
-  - name: "lis-su-par-su-krk-su"
-    supports:
-      - provider: "lisbon"
-        storage_name: "SlowNullStorage"
-        size: '100125899906840000000000000'
-      - provider: "paris"
-        storage_name: "SlowNullStorage"
-        size: '100125899906840000000000000'
-      - provider: "krakow"
-        storage_name: "SlowNullStorage"
-        size: '100125899906840000000000000'
-
-
 
 # Those variables are the unfortunate necessity of an issue discussed here:
 # https://github.com/kubernetes/helm/issues/2479]
