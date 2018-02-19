@@ -51,7 +51,7 @@ kubectl -n $namespace get pod  | grep Terminating | cut -d ' ' -f 1 | xargs -I{}
 
 echo "Waiting for pods to terminate"
 # Lets be sure, this namespace is empty
-output="" ;
+output=$(kubectl -n $namespace  get pod 2>&1)
 while [[ "$output" != "No resources found." ]] ; do
   output=$(kubectl -n $namespace  get pod 2>&1)
   echo "Waiting for the namespace=$namespace to be empty"
