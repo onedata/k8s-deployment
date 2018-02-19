@@ -192,7 +192,7 @@ main() {
 
     type docker-compose >/dev/null 2>&1 || {
         echo >&2 "I require docker-compose but it's not installed. Downloading..." ;
-        curl -L https://github.com/docker/compose/releases/download/1.13.0/docker-compose-`uname -s`-`uname -m` > docker-compose
+        curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > docker-compose
         chmod +x docker-compose
         export PATH=$PATH:.
     }
