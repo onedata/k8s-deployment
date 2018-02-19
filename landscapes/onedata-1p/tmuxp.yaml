@@ -1,27 +1,28 @@
-session_name: ${kube_user}/{$landscape}/${namespace}/${release_name}
+session_name: ${session_name}
 windows:
 - window_name: oneproviders-htop
   layout: even-vertical
   shell_command_before:
     - export release_name=$release_name
+    - export namespace=$namespace
   panes:
     - shell_command:
-        - export PROVIDER_ID=-krakow
-        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) bash
+        - export PROVIDER_ID=-krakow    
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) bash
         - apt update
         - apt install -y htop
         - export TERM=xterm
         - htop
     - shell_command:
         - export PROVIDER_ID=-paris
-        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) bash
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) bash
         - apt update
         - apt install -y htop
         - export TERM=xterm
         - htop
     - shell_command:
         - export PROVIDER_ID=-lisbon
-        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) bash
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) bash
         - apt update
         - apt install -y htop
         - export TERM=xterm
@@ -31,22 +32,42 @@ windows:
   layout: even-horizontal
   shell_command_before:
     - export release_name=$release_name
+    - export namespace=$namespace
   panes:
     - shell_command:
         - export PROVIDER_ID=-krakow
-        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) bash
+        - kubectl port-forward -n $namespace $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) 18091:8091 &
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) bash
         - pkill  -f "/usr/lib/op_worker/erts-8.2/bin/to_erl /tmp/op_worker/"
         - op_worker attach-direct
     - shell_command:
         - export PROVIDER_ID=-paris
-        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) bash
+        - kubectl port-forward -n $namespace $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) 28091:8091 &
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) bash
         - pkill  -f "/usr/lib/op_worker/erts-8.2/bin/to_erl /tmp/op_worker/"
         - op_worker attach-direct
     - shell_command:
         - export PROVIDER_ID=-lisbon
-        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) bash
+        - kubectl port-forward -n $namespace $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) 38091:8091 &
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) bash
         - pkill  -f "/usr/lib/op_worker/erts-8.2/bin/to_erl /tmp/op_worker/"
         - op_worker attach-direct
+
+- window_name: onezone
+  layout: even-vertical
+  shell_command_before:
+    - export release_name=$release_name
+  panes:
+    - shell_command:
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-onezone,release=${release_name},onedata-service=onezone" -o name  | cut -d '/' -f 2) bash
+        - apt update
+        - apt install -y htop
+        - export TERM=xterm
+        - htop
+    - shell_command:
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-onezone,release=${release_name},onedata-service=onezone" -o name  | cut -d '/' -f 2) bash
+        - pkill  -f "/usr/lib/oz_worker/erts-8.2/bin/to_erl /tmp/oz_worker/"
+        - oz_worker attach-direct
 
 - window_name: oneclinets
   layout: even-horizontal
@@ -54,6 +75,7 @@ windows:
   #  synchronize-panes: on
   shell_command_before:
     - export release_name=$release_name
+    - export namespace=$namespace
   panes:
     - shell_command:
         - export ONECLINET_ID=-krakow
@@ -62,7 +84,15 @@ windows:
         - naive() { apt install -y git python3 python3-pip ; pip3 install humanize ; git -C / clone https://github.com/bkryza/naive-bench.git ; }
         - alias bench="/naive-bench/naive-bench.py -f 1000 -s 1MB -b 512KB -t 5 -F -c"
         - alias ctf="echo $ONECLIENT_PROVIDER_HOST > $ID"
-        - export PS1="${debian_chroot:+($debian_chroot)}\u@\h[$ID]:\w\$"
+        # < Begining of a custom prompt >
+        - function timer_start { timer=${timer:-$SECONDS} ; }
+        - function timer_stop { timer_show=$(($SECONDS - $timer)) ; unset timer ; }
+        - export ES=""
+        - function exit_status { local EXIT="$?" ; [ $EXIT != 0 ] && ES="[exit':' $EXIT]" || ES="" ; }
+        - trap 'timer_start' DEBUG
+        - export PROMPT_COMMAND="exit_status; timer_stop;"
+        - export PS1='\[\e[1;33m\][\t]${debian_chroot:+($debian_chroot)}\u@\h:\w\n\[\e[1;36m\][last':' ${timer_show}s][$ID]\[\e[m\]\[\e[0;31m\]$ES\[\e[0m\]$ '
+        # < End of  a custom prompt >
         - cd /mnt/oneclient
         - ls -l
     - shell_command:
@@ -72,7 +102,15 @@ windows:
         - naive() { apt install -y git python3 python3-pip ; pip3 install humanize ; git -C / clone https://github.com/bkryza/naive-bench.git ; }
         - alias bench="/naive-bench/naive-bench.py -f 1000 -s 1MB -b 512KB -t 5 -F -c"
         - alias ctf="echo $ONECLIENT_PROVIDER_HOST > $ID"
-        - export PS1="${debian_chroot:+($debian_chroot)}\u@\h[$ID]:\w\$"
+        # < Begining of a custom prompt >
+        - function timer_start { timer=${timer:-$SECONDS} ; }
+        - function timer_stop { timer_show=$(($SECONDS - $timer)) ; unset timer ; }
+        - export ES=""
+        - function exit_status { local EXIT="$?" ; [ $EXIT != 0 ] && ES="[exit':' $EXIT]" || ES="" ; }
+        - trap 'timer_start' DEBUG
+        - export PROMPT_COMMAND="exit_status; timer_stop;"
+        - export PS1='\[\e[1;33m\][\t]${debian_chroot:+($debian_chroot)}\u@\h:\w\n\[\e[1;36m\][last':' ${timer_show}s][$ID]\[\e[m\]\[\e[0;31m\]$ES\[\e[0m\]$ '
+        # < End of  a custom prompt >
         - cd /mnt/oneclient
         - ls -l
     - shell_command:
@@ -82,6 +120,14 @@ windows:
         - naive() { apt install -y git python3 python3-pip ; pip3 install humanize ; git -C / clone https://github.com/bkryza/naive-bench.git ; }
         - alias bench="/naive-bench/naive-bench.py -f 1000 -s 1MB -b 512KB -t 5 -F -c"
         - alias ctf="echo $ONECLIENT_PROVIDER_HOST > $ID"
-        - export PS1="${debian_chroot:+($debian_chroot)}\u@\h[$ID]:\w\$"
+        # < Begining of a custom prompt >
+        - function timer_start { timer=${timer:-$SECONDS} ; }
+        - function timer_stop { timer_show=$(($SECONDS - $timer)) ; unset timer ; }
+        - export ES=""
+        - function exit_status { local EXIT="$?" ; [ $EXIT != 0 ] && ES="[exit':' $EXIT]" || ES="" ; }
+        - trap 'timer_start' DEBUG
+        - export PROMPT_COMMAND="exit_status; timer_stop;"
+        - export PS1='\[\e[1;33m\][\t]${debian_chroot:+($debian_chroot)}\u@\h:\w\n\[\e[1;36m\][last':' ${timer_show}s][$ID]\[\e[m\]\[\e[0;31m\]$ES\[\e[0m\]$ '
+        # < End of  a custom prompt >
         - cd /mnt/oneclient
         - ls -l
