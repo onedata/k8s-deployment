@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+BAMBOO_URL="https://bamboo.plgrid.pl"
+
 command_exists() {
   command -v "$@" > /dev/null 2>&1
 }
@@ -15,6 +17,44 @@ check_requirement() {
 check_requirements() {
   for requirement in "$@" ; do
     check_requirement "$requirement" || exit 1
+  done
+}
+
+authenticate_with_bamboo() {
+  echo "Authenticating with bamboo using user PL_USER=$PL_USER"
+  [[ -z ${PL_USER+x} ]] && echo "ERROR: please export PL_USER variable. Exiting." && exit 1 ;
+  [[ -z ${PL_PASSWORD+x} ]] && echo "ERROR: please export PL_USER variable. Exiting." && exit 1 ;
+  curl --output /dev/null --silent -u "$PL_USER:$PL_PASSWORD" --cookie-jar bamboo_cookie.txt "${BAMBOO_URL}/userlogin!default.action?os_authType=basic" --head
+}
+
+download_artefact() {
+  local build_number="$1"
+  local branch_number="$2"
+  local artefact=""
+  echo "Downloading build ${BAMBOO_URL}/browse/ODSRV-K8SD${branch_number}-${build_number}"
+  i=0;
+  while : ; do
+    artefact="$(curl --silent --cookie bamboo_cookie.txt ${BAMBOO_URL}/browse/ODSRV-K8SD${branch_number}-${build_number}/artifact/shared/onedata-docker-build-list.txt/onedata-docker-build-list.txt)"
+    if [[ "$artefact" == "" ]] ; then
+      ((i++))
+      if [[ $i -le 3 ]] ; then
+          echo "Faild to download artefact (${i} try out of 3). Probably bamboo sesion expired. Renewing session..."
+          authenticate_with_bamboo
+        else
+          echo "After $i attemtps failed to download artefact. Exiting..." ;
+          exit 1
+      fi
+    else
+      while read line; do
+        component=`echo ${line} | cut -d : -f 1`
+        image=`echo ${line} | cut -d : -f 2-`
+        [[ $component =~ onezone ]] && export bamboo_oz_image=$image
+        [[ $component =~ oneprovider ]] && export bamboo_op_image=$image
+        [[ $component =~ oneclient ]]  && export bamboo_oc_image=$image
+        [[ $component =~ rest\-cli ]] && export bamboo_cli_image=$image
+      done < <(echo "$artefact")
+      break
+    fi
   done
 }
 
@@ -35,6 +75,8 @@ Options:
   --helm-local-dir           path you for helm config directory, defaults to ~/.helm
   --landscape                name of a directory in landscapes directory you want to use, defaults to develop
   --lifetime                 number or hours ([1-9][0-9]*), after which this deployment will be scheduled for deletion
+  --bamboo-build             a build number of k8s-deployment build plan https://bamboo.plgrid.pl/browse/ODSRV-K8SD-<build>
+  --bamboo-branch            a branch number of k8s-deployment build plan https://bamboo.plgrid.pl/browse/ODSRV-K8SD<branch>
   --user                     set owner of this release (defaults to $USER)
   --rn                       helm release name 
   --ns                       namespace to deploy into
@@ -79,6 +121,8 @@ main() {
   cli_image=""
   helm_debug=""
   helm_dry_run=""
+  bamboo_build=""
+  bamboo_branch=""
   generate_tmuxp=0
   helm_local_dir=""
   helm_local_charts_dir=""
@@ -123,6 +167,14 @@ main() {
               ;;
           --rn)
               release_name=$2
+              shift
+              ;;
+          --bamboo-build)
+              bamboo_build=$2
+              shift
+              ;;
+          --bamboo-branch)
+              bamboo_branch=$2
               shift
               ;;
           --debug)
@@ -175,13 +227,20 @@ main() {
     if [[ -z $kube_config ]] ; then kube_config="~/.kube/config" ; fi
     if [[ -z $helm_local_dir ]] ; then helm_local_dir="~/.helm" ; fi
     
+    [[ "$bamboo_build" != "" ]] && download_artefact "$bamboo_build" "$bamboo_branch"
+
+    if [[ "$oz_image" != "" ]]; then oz_image=${image_prefix}$oz_image  ; else oz_image="$bamboo_oz_image" ; fi
+    if [[ "$op_image" != "" ]]; then op_image=${image_prefix}$op_image ; else op_image="$bamboo_op_image" ; fi
+    if [[ "$oc_image" != "" ]]; then oc_image=${image_prefix}$oc_image ; else oc_image="$bamboo_oc_image" ; fi
+    if [[ "$cli_image" != "" ]]; then cli_image=${image_prefix}$cli_image ; else cli_image="$bamboo_cli_image" ; fi
+
     export kube_config="$kube_config"
     export namespace=$namespace
-    export release_name=$release_name
-    export oz_image=${image_prefix}$oz_image
-    export op_image=${image_prefix}$op_image
-    export oc_image=${image_prefix}$oc_image
-    export cli_image=${image_prefix}$cli_image
+    export release_name="$release_name"
+    export oz_image
+    export op_image
+    export oc_image
+    export cli_image
     export helm_debug=$helm_debug
     export helm_dry_run=$helm_dry_run
     export helm_local_dir=$helm_local_dir
