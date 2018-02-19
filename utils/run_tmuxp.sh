@@ -18,12 +18,12 @@ main() {
     export landscape
     export namespace
     export release_name
+    export session_name="${kube_user}/${landscape}/${namespace}/${release_name}"
 
     # k stands for kill the session if it existed        
     if [[ $flags =~ k ]]; then
-        echo "l"
-        if tmux has-session $session_name ; then
-            tmux kill-session $session_name
+        if tmux has-session -t "$session_name" ; then
+            tmux kill-session -t "$session_name"
         fi
     fi
 
