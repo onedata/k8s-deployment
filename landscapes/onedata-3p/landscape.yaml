@@ -82,6 +82,38 @@ spaces:
       - provider: "paris"
         storage_name: "BusyNullStorage"
         size: '1125899906842624'
+  - name: "lis-bu-par-bu"
+    supports:
+      - provider: "lisbon"
+        storage_name: "BusyNullStorage"
+        size: '1125899906842624'
+      - provider: "paris"
+        storage_name: "BusyNullStorage"
+        size: '1125899906842624'
+  - name: "lis-iu-par-iu"
+    supports:
+      - provider: "lisbon"
+        storage_name: "IdealNullStorage"
+        size: '1125899906842624'
+      - provider: "paris"
+        storage_name: "IdealNullStorage"
+        size: '1125899906842624'
+  - name: "lis-su-par-su"
+    supports:
+      - provider: "lisbon"
+        storage_name: "SlowNullStorage"
+        size: '1125899906842624'
+      - provider: "paris"
+        storage_name: "SlowNullStorage"
+        size: '1125899906842624'
+  - name: "par-bu-krk-bu"
+    supports:
+      - provider: "paris"
+        storage_name: "BusyNullStorage"
+        size: '1125899906842624'
+      - provider: "krakow"
+        storage_name: "BusyNullStorage"
+        size: '1125899906842624'
   - name: "lis-bu-par-bu-krk-bu"
     supports:
       - provider: "lisbon"
