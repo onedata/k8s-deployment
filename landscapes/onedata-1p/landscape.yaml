@@ -30,6 +30,25 @@ spaces:
       - provider: "krakow"
         storage_name: "gluster"
         size: '1073741824'
+  - name: "krk-irw"
+    supports:
+      - provider: "krakow"
+        storage_name: "volume-data-sync-rw"
+        size: '1073741824'
+        mountInRoot: true
+        import:
+          strategy: "simple_scan"
+        update:
+          strategy: "simple_scan"
+          deleteEnable: true
+  - name: "krk-iro"
+    supports:
+      - provider: "krakow"
+        storage_name: "volume-data-sync-ro"
+        size: '1073741824'
+        mountInRoot: true
+        import:
+          strategy: "simple_scan"
 
 # Those variables are the unfortunate necessity of an issue discussed here:
 # https://github.com/kubernetes/helm/issues/2479]
@@ -51,6 +70,8 @@ volume-gluster:
   enabled: *gluster_enabled
 volume-swift:
   enabled: *swift_enabled
+volume-data-sync:
+  enabled: *volume_data_sync_enabled
 
 onedata-1p: 
   oz_image: &oz_image onedata/onezone:17.06.0-rc1
@@ -84,6 +105,8 @@ onedata-1p:
   nfs_enabled: &nfs_enabled true
   gluster_enabled: &gluster_enabled true
   swift_enabled: &swift_enabled false
+
+  volume_data_sync_enabled: &volume_data_sync_enabled true
 
   # Explicately wait for onezone pod to enter ready state before starting oneproviders
   wait-for-onezone-enabled: &wait-for-onezone-enabled false
@@ -172,6 +195,9 @@ onedata-1p:
     luma:
       suffix: *op1s
       << : *luma_global
+
+    volume-data-sync:
+      enabled: *volume_data_sync_enabled
 
     oneclient:
       image: *oc_image
