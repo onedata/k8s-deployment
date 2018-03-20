@@ -71,8 +71,10 @@ onedata-1p:
     workers: [ ]
     databases: [ ]
 
-  oneclients_enabled: &oneclients_enabled true
-  onedata_cli_enabled: &onedata_cli_enabled true
+  oneprovidersPanelOverlayConfig: &oneprovidersPanelOverlayConfig |-
+    [].
+  oneprovidersWorkerOverlayConfig: &oneprovidersPanelOverlayConfig |-
+    [].
 
   luma_enabled: &luma_enabled false 
  
@@ -136,6 +138,10 @@ onedata-1p:
       enabled: &idp_enabled true
       generate-certificates: 
         enabled: true
+    panelOverlayConfig: |-
+      [].
+    workerOverlayConfig: |-
+      [].
 
   # What follows are the providers configurations for providers designated as:
   # krakow, paris, and lisbon
@@ -150,11 +156,11 @@ onedata-1p:
     nameOverride: oneprovider
     wait-for-onezone: *wait-for-onezone-enabled
 
-    oneprovider_nodes_count: 3
-    cluster_config:
-      managers: [ 0 ]
-      workers: [ 0, 1 ]
-      databases: [ 2 ]
+    oneprovider_nodes_count: *oneproviders_nodes_count
+    cluster_config: *oneprovider_cluster_configs
+
+    panelOverlayConfig: *oneprovidersPanelOverlayConfig
+    workerOverlayConfig: *oneprovidersPanelOverlayConfig
 
     onezone_service_url:
       type: auto-generate
