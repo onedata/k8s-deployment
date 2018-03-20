@@ -260,8 +260,8 @@ onedata-3p:
       readonly: true
     SlowNullStorage:
       type: nulldevice
-      latencyMin: 25
-      latencyMax: 100
+      latencyMin: 2
+      latencyMax: 15
       #timeoutProbability: !!float 0.0
       insecure: true
       readonly: true
