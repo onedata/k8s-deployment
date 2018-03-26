@@ -28,6 +28,8 @@ windows:
         - export TERM=xterm
         - htop
 
+
+
 - window_name: oneproviders
   layout: even-horizontal
   shell_command_before:
@@ -131,3 +133,25 @@ windows:
         # < End of  a custom prompt >
         - cd /mnt/oneclient
         - ls -l
+- window_name: rest-cli
+  layout: even-vertical
+  shell_command_before:
+    - export release_name=$release_name
+    - export namespace=$namespace
+  panes:
+    - shell_command:
+        - export PROVIDER_ID=-krakow    
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-onedata-cli${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) zsh
+        - export TERM=xterm
+        - export ONEPROVIDER_API_KEY=$ONEZONE_API_KEY
+    - shell_command:
+        - export PROVIDER_ID=-paris
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-onedata-cli${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) zsh
+        - export TERM=xterm
+        - export ONEPROVIDER_API_KEY=$ONEZONE_API_KEY
+    - shell_command:
+        - export PROVIDER_ID=-lisbon
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-onedata-cli${PROVIDER_ID},release=${release_name}" -o name  | cut -d '/' -f 2) zsh
+        - export TERM=xterm
+        - export ONEPROVIDER_API_KEY=$ONEZONE_API_KEY
+        
