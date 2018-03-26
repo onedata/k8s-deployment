@@ -87,7 +87,7 @@ spaces:
       - provider: "lisbon"
         storage_name: "nfs"
         size: '1073741824'
-  - name: "krk-piro-c-lis-n"
+  - name: "krk-piro-par-c-lis-n"
     supports:
       - provider: "krakow"
         storage_name: "volume-data-sync-ro"
