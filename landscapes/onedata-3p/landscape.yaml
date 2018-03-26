@@ -13,6 +13,7 @@ oneprovider:
   - oneprovider-lisbon
 
 spaces:
+  # Proper spaces
   - name: "krk-3"
     supports:
       - provider: "krakow"
@@ -68,6 +69,39 @@ spaces:
       - provider: "krakow"
         storage_name: "gluster"
         size: '1073741824' 
+  # Proper spaces with import
+  - name: "krk-pirw-par-3-lis-n"
+    supports:
+      - provider: "krakow"
+        storage_name: "volume-data-sync-rw"
+        size: '1073741824'
+        mountInRoot: true
+        import:
+          strategy: "simple_scan"
+        update:
+          strategy: "simple_scan"
+          deleteEnable: true
+      - provider: "paris"
+        storage_name: "s3"
+        size: '1073741824'
+      - provider: "lisbon"
+        storage_name: "nfs"
+        size: '1073741824'
+  - name: "krk-piro-par-c-lis-n"
+    supports:
+      - provider: "krakow"
+        storage_name: "volume-data-sync-ro"
+        size: '1073741824'
+        mountInRoot: true
+        import:
+          strategy: "simple_scan"
+      - provider: "paris"
+        storage_name: "ceph"
+        size: '1073741824'
+      - provider: "lisbon"
+        storage_name: "nfs"
+        size: '1073741824'
+  # Null device spaces
   - name: "krk-iu"
     supports:
       - provider: "krakow"
@@ -171,6 +205,8 @@ volume-gluster:
   enabled: *gluster_enabled
 volume-swift:
   enabled: *swift_enabled
+volume-data-sync:
+  enabled: *volume_data_sync_enabled
   
 onedata-3p: 
   oz_image: &oz_image onedata/onezone:17.06.0-rc1
@@ -191,6 +227,11 @@ onedata-3p:
     workers: [ ]
     databases: [ ]
 
+  oneprovidersPanelOverlayConfig: &oneprovidersPanelOverlayConfig |-
+    [].
+  oneprovidersWorkerOverlayConfig: &oneprovidersPanelOverlayConfig |-
+    [].
+
   oneclients_enabled: &oneclients_enabled true
   onedata_cli_enabled: &onedata_cli_enabled true
 
@@ -203,6 +244,8 @@ onedata-3p:
   gluster_enabled: &gluster_enabled true
   swift_enabled: &swift_enabled false
  
+  volume_data_sync_enabled: &volume_data_sync_enabled true
+
   # Explicately wait for onezone pod to enter ready state before starting oneproviders
   wait-for-onezone-enabled: &wait-for-onezone-enabled false
 
@@ -217,8 +260,8 @@ onedata-3p:
       readonly: true
     SlowNullStorage:
       type: nulldevice
-      latencyMin: 25
-      latencyMax: 100
+      latencyMin: 2
+      latencyMax: 15
       #timeoutProbability: !!float 0.0
       insecure: true
       readonly: true
@@ -281,6 +324,10 @@ onedata-3p:
       enabled: &idp_enabled true
       generate-certificates: 
         enabled: true
+    panelOverlayConfig: |-
+      [].
+    workerOverlayConfig: |-
+      [].
 
   # What follows are the providers configurations for providers designated as:
   # krakow, paris, and lisbon
@@ -298,6 +345,9 @@ onedata-3p:
     oneprovider_nodes_count: *oneproviders_nodes_count
     cluster_config: *oneprovider_cluster_configs
 
+    panelOverlayConfig: *oneprovidersPanelOverlayConfig
+    workerOverlayConfig: *oneprovidersPanelOverlayConfig
+
     onezone_service_url:
       type: auto-generate
       disableSuffix: true
@@ -308,6 +358,9 @@ onedata-3p:
     luma:
       suffix: *op1s
       << : *luma_global
+
+    volume-data-sync:
+      enabled: *volume_data_sync_enabled
 
     oneclient:
       image: *oc_image
@@ -361,6 +414,9 @@ onedata-3p:
     oneprovider_nodes_count: *oneproviders_nodes_count
     cluster_config: *oneprovider_cluster_configs
 
+    panelOverlayConfig: *oneprovidersPanelOverlayConfig
+    workerOverlayConfig: *oneprovidersPanelOverlayConfig
+
     onezone_service_url:
       type: auto-generate
       disableSuffix: true
@@ -371,6 +427,9 @@ onedata-3p:
     luma:
       suffix: *op2s
       << : *luma_global
+
+    volume-data-sync:
+      enabled: *volume_data_sync_enabled
 
     oneclient:
       image: *oc_image
@@ -424,6 +483,9 @@ onedata-3p:
     oneprovider_nodes_count: *oneproviders_nodes_count
     cluster_config: *oneprovider_cluster_configs
 
+    panelOverlayConfig: *oneprovidersPanelOverlayConfig
+    workerOverlayConfig: *oneprovidersPanelOverlayConfig
+
     onezone_service_url:
       type: auto-generate
       disableSuffix: true
@@ -434,6 +496,9 @@ onedata-3p:
     luma:
       suffix: *op3s
       << : *luma_global
+      
+    volume-data-sync:
+      enabled: *volume_data_sync_enabled
       
     oneclient:
       image: *oc_image

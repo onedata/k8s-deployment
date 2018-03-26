@@ -30,6 +30,25 @@ spaces:
       - provider: "krakow"
         storage_name: "gluster"
         size: '1073741824'
+  - name: "krk-irw"
+    supports:
+      - provider: "krakow"
+        storage_name: "volume-data-sync-rw"
+        size: '1073741824'
+        mountInRoot: true
+        import:
+          strategy: "simple_scan"
+        update:
+          strategy: "simple_scan"
+          deleteEnable: true
+  - name: "krk-iro"
+    supports:
+      - provider: "krakow"
+        storage_name: "volume-data-sync-ro"
+        size: '1073741824'
+        mountInRoot: true
+        import:
+          strategy: "simple_scan"
 
 # Those variables are the unfortunate necessity of an issue discussed here:
 # https://github.com/kubernetes/helm/issues/2479]
@@ -51,6 +70,8 @@ volume-gluster:
   enabled: *gluster_enabled
 volume-swift:
   enabled: *swift_enabled
+volume-data-sync:
+  enabled: *volume_data_sync_enabled
 
 onedata-1p: 
   oz_image: &oz_image onedata/onezone:17.06.0-rc1
@@ -71,8 +92,10 @@ onedata-1p:
     workers: [ ]
     databases: [ ]
 
-  oneclients_enabled: &oneclients_enabled true
-  onedata_cli_enabled: &onedata_cli_enabled true
+  oneprovidersPanelOverlayConfig: &oneprovidersPanelOverlayConfig |-
+    [].
+  oneprovidersWorkerOverlayConfig: &oneprovidersPanelOverlayConfig |-
+    [].
 
   luma_enabled: &luma_enabled false 
  
@@ -82,6 +105,8 @@ onedata-1p:
   nfs_enabled: &nfs_enabled true
   gluster_enabled: &gluster_enabled true
   swift_enabled: &swift_enabled false
+
+  volume_data_sync_enabled: &volume_data_sync_enabled true
 
   # Explicately wait for onezone pod to enter ready state before starting oneproviders
   wait-for-onezone-enabled: &wait-for-onezone-enabled false
@@ -136,6 +161,10 @@ onedata-1p:
       enabled: &idp_enabled true
       generate-certificates: 
         enabled: true
+    panelOverlayConfig: |-
+      [].
+    workerOverlayConfig: |-
+      [].
 
   # What follows are the providers configurations for providers designated as:
   # krakow, paris, and lisbon
@@ -150,11 +179,11 @@ onedata-1p:
     nameOverride: oneprovider
     wait-for-onezone: *wait-for-onezone-enabled
 
-    oneprovider_nodes_count: 3
-    cluster_config:
-      managers: [ 0 ]
-      workers: [ 0, 1 ]
-      databases: [ 2 ]
+    oneprovider_nodes_count: *oneproviders_nodes_count
+    cluster_config: *oneprovider_cluster_configs
+
+    panelOverlayConfig: *oneprovidersPanelOverlayConfig
+    workerOverlayConfig: *oneprovidersPanelOverlayConfig
 
     onezone_service_url:
       type: auto-generate
@@ -166,6 +195,9 @@ onedata-1p:
     luma:
       suffix: *op1s
       << : *luma_global
+
+    volume-data-sync:
+      enabled: *volume_data_sync_enabled
 
     oneclient:
       image: *oc_image
