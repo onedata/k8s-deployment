@@ -52,11 +52,12 @@ download_artefact() {
         [[ $component =~ oneprovider ]] && export bamboo_op_image=$image
         [[ $component =~ oneclient ]]  && export bamboo_oc_image=$image
         [[ $component =~ rest\-cli ]] && export bamboo_cli_image=$image
+        [[ $component =~ luma ]] && export bamboo_luma_image=$image
       done < <(echo "$artefact")
       break
     fi
   done
-}
+}   
 
 usage() {
 cat <<EOF
@@ -84,7 +85,9 @@ Options:
   --oz                       onezone docker image
   --op                       oneprovider docker image
   --oc                       oneclient docker image
+  --lu                       luma docker image
   --cli                      rest-cli docker image
+  --wait-for-clean-namespace wait for all pods to exit before starting a deployment
 
 Example:
 Can be run without any arguments, then all needed values are taken from your ~/.kube/config:
@@ -119,6 +122,7 @@ main() {
   op_image=""
   oc_image=""
   cli_image=""
+  luma_image=""
   helm_debug=""
   helm_dry_run=""
   bamboo_build=""
@@ -152,6 +156,10 @@ main() {
               ;;
           --cli)
               cli_image=$2
+              shift
+              ;;
+          --lu)
+              luma_image=$2
               shift
               ;;
           --prefix)
@@ -236,6 +244,7 @@ main() {
     if [[ "$op_image" != "" ]]; then op_image=${image_prefix}$op_image ; else op_image="$bamboo_op_image" ; fi
     if [[ "$oc_image" != "" ]]; then oc_image=${image_prefix}$oc_image ; else oc_image="$bamboo_oc_image" ; fi
     if [[ "$cli_image" != "" ]]; then cli_image=${image_prefix}$cli_image ; else cli_image="$bamboo_cli_image" ; fi
+    if [[ "$luma_image" != "" ]]; then cli_image=${image_prefix}$luma_image ; else luma_image="$bamboo_luma_image" ; fi
 
     export kube_config="$kube_config"
     export namespace=$namespace
@@ -244,6 +253,7 @@ main() {
     export op_image
     export oc_image
     export cli_image
+    export luma_image
     export helm_debug=$helm_debug
     export helm_dry_run=$helm_dry_run
     export helm_local_dir=$helm_local_dir
