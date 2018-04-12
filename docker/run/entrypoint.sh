@@ -78,6 +78,9 @@ fi
 if [[ "$cli_image" != "" ]]; then
   echo "  cli_image: &cli_image $cli_image" >> "$landscae_path"
 fi
+if [[ "$luma_image" != "" ]]; then
+  echo "  luma_image: &luma_image $luma_image" >> "$landscae_path"
+fi
 if [[ "$cli_image" != "" ]]; then
   echo "image: $cli_image" >> "$landscae_path"
 fi
