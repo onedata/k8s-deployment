@@ -244,7 +244,7 @@ main() {
     if [[ "$op_image" != "" ]]; then op_image=${image_prefix}$op_image ; else op_image="$bamboo_op_image" ; fi
     if [[ "$oc_image" != "" ]]; then oc_image=${image_prefix}$oc_image ; else oc_image="$bamboo_oc_image" ; fi
     if [[ "$cli_image" != "" ]]; then cli_image=${image_prefix}$cli_image ; else cli_image="$bamboo_cli_image" ; fi
-    if [[ "$luma_image" != "" ]]; then cli_image=${image_prefix}$luma_image ; else luma_image="$bamboo_luma_image" ; fi
+    if [[ "$luma_image" != "" ]]; then luma_image=${image_prefix}$luma_image ; else luma_image="$bamboo_luma_image" ; fi
 
     export kube_config="$kube_config"
     export namespace=$namespace
