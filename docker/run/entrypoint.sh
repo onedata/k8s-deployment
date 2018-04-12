@@ -39,6 +39,7 @@ else
   echo "No release_name specified, no cleaning of previous releases is done"
 fi
 
+if (( $wait_for_clean_namespace )); then
 echo "Starting to wait for all pods except for oneprovider to exit"
 while kubectl -n $namespace get pods -o name | grep -v '\-oneprovider' ; do
   sleep 1 ;
@@ -57,6 +58,7 @@ while [[ "$output" != "No resources found." ]] ; do
   echo "Waiting for the namespace=$namespace to be empty"
   sleep 3
 done
+fi
 
 # Modify deployment
 ## Thanks to the fact how yaml is parsed, in order to override images

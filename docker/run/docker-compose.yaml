@@ -19,6 +19,7 @@ services:
       release_name: "$release_name"
       helm_debug: "$helm_debug"
       helm_dry_run: "$helm_dry_run"
+      wait_for_clean_namespace: "$wait_for_clean_namespace"
       landscape: "$landscape"
       user: "$user"
       lifetime: "$lifetime"
