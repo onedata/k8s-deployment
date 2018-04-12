@@ -130,6 +130,7 @@ main() {
   lifetime=12
   lifetime_set=false
   user=$USER
+  wait_for_clean_namespace=0
 
   while (( $# )); do
       case $1 in
@@ -211,7 +212,9 @@ main() {
               user=$2
               shift
               ;;
-          --debug)
+          --wait-for-clean-namespace)
+              wait_for_clean_namespace=1
+              shift
               ;;
           -?*)
               printf 'WARN: Unknown option (ignored): %s\n' "$1" >&2
@@ -248,6 +251,7 @@ main() {
     export landscape=$landscape
     export user=$user
     export lifetime=$lifetime
+    export wait_for_clean_namespace
 
     type docker-compose >/dev/null 2>&1 || {
         echo >&2 "I require docker-compose but it's not installed. Downloading..." ;
