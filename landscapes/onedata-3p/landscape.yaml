@@ -545,7 +545,7 @@ onedata-3p:
       workers: [ ]
       databases: [ ]
     saml-idp:
-      enabled: &idp_enabled false
+      enabled: &idp_enabled true
       generate-certificates: 
         enabled: true
     panelOverlayConfig: |-
