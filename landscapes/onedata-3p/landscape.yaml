@@ -1,36 +1,87 @@
 global:
   # TODO: Find a way to eliminate necessity for region and tld values
   # to make deployment cluster independent
-  releaseNameOverride:
+  #releaseNameOverride: ""
   region: dev
   tld: onedata.uk.to
   imagePullPolicy: "Always"
 
-image: onedata/rest-cli:17.06.0-beta6
+oneprovider-krakow:
+  enabled: true
+oneprovider-paris:
+  enabled: true
+oneprovider-lisbon:
+  enabled: true
 
-oneprovider:
-  - oneprovider-krakow
-  - oneprovider-paris
-  - oneprovider-lisbon
+allOneproviders: &allOneproviders
+  - krakow
+  - lisbon
+  - paris
 
-groups:
+keycloakInstance: *keycloak
+deployment_enabled: &deployment_enabled true
+
+groups: &all_groups
   - &group_alpha
     name: alpha
+    idps:
+      onezone:
+        enabled: true
     luma:
       - name: krakow
         storages:
           - name: volume-data-sync-rw-luma
             gid: 42001
-        storages:
           - name: posix
             gid: 42001
   - &group_beta
     name: beta
+    idps:
+      onezone:
+        enabled: true
+    posix:
+      gid: 50002
   - &group_gamma
     name: gamma
+    idps:
+      onezone:
+        enabled: true
+    posix:
+      gid: 50003
   - &group_delta
     name: delta
-
+    idps:
+      onezone:
+        enabled: true
+    posix:
+      gid: 50004
+  # Keycloak open-id groups
+  - &group_un
+    name: un
+    idps:
+      keycloak:
+        children: [ *group_deux  ]
+        enabled: true
+    posix:
+      gid: 60001
+  - &group_deux
+    name: deux
+    idps:
+      keycloak:
+        children: [ *group_trois ]
+        child: true
+        enabled: true
+    posix:
+      gid: 60002
+  - &group_trois
+    name: trois
+    idps:
+      keycloak:
+        users: [ *user_marie, *user_pier ]
+        child: true
+        enabled: true
+    posix:
+      gid: 60003
 
 all_group_privileges: &all_group_privileges
   - group_create_space
@@ -63,10 +114,15 @@ all_space_privileges: &all_space_privileges
 users: &all_users
   - &user_joe
     name: joe
-    type: regular
-    idp: onepanel
+    firstName: Joe
+    lastName: Morgan
+    idps:
+      onepanel:
+        type: regular
+        enabled: true
     password: password
     email: joe@example.com
+    oneclient: *allOneproviders
     luma:
       - name: krakow
         storages:
@@ -87,12 +143,24 @@ users: &all_users
         privileges: *all_group_privileges
       - group: *group_delta
         privileges: *all_group_privileges
+      # Keycloak groups
+      - group: *group_un
+        privileges: *all_group_privileges
+      - group: *group_deux
+        privileges: *all_group_privileges
+      - group: *group_trois
+        privileges: *all_group_privileges
   - &user_tom
     name: tom
-    type: regular
-    idp: onepanel
+    firstName: Tom
+    lastName: Doe
+    idps:
+      onepanel:
+        type: regular
+        enabled: true
     password: password
     email: tom@example.com
+    oneclient: *allOneproviders
     groups:
       - group: *group_alpha
         privileges: *all_group_privileges
@@ -104,10 +172,15 @@ users: &all_users
         privileges: *all_group_privileges
   - &user_meg
     name: meg
-    type: regular
-    idp: onepanel
+    firstName: Meg
+    lastName: Rayan
+    idps:
+      onepanel:
+        type: regular
+        enabled: true
     password: password
     email: meg@example.com
+    oneclient: *allOneproviders
     groups:
       - group: *group_alpha
         privileges: *all_group_privileges
@@ -120,9 +193,15 @@ users: &all_users
   - &user_karen
     name: karen
     type: regular
-    idp: onepanel
+    firstName: Karen
+    lastName: Fisher
+    idps:
+      onepanel:
+        type: regular
+        enabled: true
     password: password
     email: karen@example.com
+    oneclient: *allOneproviders
     groups:
       - group: *group_alpha
         privileges: *all_group_privileges
@@ -132,13 +211,64 @@ users: &all_users
         privileges: *all_group_privileges
       - group: *group_delta
         privileges: *all_group_privileges
+# keycloak users
+  - &user_pier
+    name: pier
+    firstName: Pier
+    lastName: Segal
+    idps:
+      keycloak:
+        enabled: true
+        onezoneLogin: true
+    password: password
+    email: pier@example.com
+    oneclient: []
+    luma:
+      - name: krakow
+        storages:
+        - name: posix
+          uid: 50001
+          gid: 51001
+    groups:
+      - group: *group_alpha
+        # comment out 'privileges' to make onezone
+        # assign default privileges
+        privileges: *all_group_privileges
+      - group: *group_beta
+        privileges: *all_group_privileges
+      - group: *group_gamma
+        privileges: *all_group_privileges
+      - group: *group_delta
+        privileges: *all_group_privileges
+  - &user_marie
+    name: marie
+    firstName: Marie
+    lastName: Page
+    idps:
+      keycloak:
+        enabled: true
+        onezoneLogin: false
+    password: password
+    email: marie@example.com
+    oneclient: *allOneproviders
+    luma:
+      - name: krakow
+        storages:
+        - name: posix
+          uid: 50002
+          gid: 51002
   # TODO: to remove this user, change how reddiness of onezone is detected
   - &user_user
     name: user
-    type: regular
-    idp: onepanel
+    firstName: user
+    lastName: user
+    idps:
+      onepanel:
+        type: regular
+        enabled: true
     password: password
     email: user@example.com
+    oneclient: []
 
 groups_graph:
   - parent: *group_alpha
@@ -153,11 +283,17 @@ groups_graph:
   - parent: *group_delta
     privileges: *all_group_privileges
     children: [ *group_alpha, *group_beta, *group_gamma ]
+    # Connect keycloak group with onezone group
+  - parent: *group_alpha
+    privileges: *all_group_privileges
+    children: [ *group_un ]
 
 spaces:
   # Proper spaces
   - name: "krk-3"
+    # TODO: change to owner
     user: *user_joe
+    # TODO: change to supportedby
     supports:
       - provider: "krakow"
         storage_name: "ceph"
@@ -406,8 +542,6 @@ spaces:
         storage_name: "SlowNullStorage"
         size: '1125899906842624'
 
-
-
 # Those variables are the unfortunate necessity of an issue discussed here:
 # https://github.com/kubernetes/helm/issues/2479]
 saml-idp:
@@ -432,11 +566,12 @@ volume-data-sync:
   enabled: *volume_data_sync_enabled
   
 onedata-3p: 
-  oz_image: &oz_image onedata/onezone:17.06.0-rc1
-  op_image: &op_image onedata/oneprovider:17.06.0-rc1
-  oc_image: &oc_image onedata/oneclient:17.06.0-rc1
-  cli_image: &cli_image onedata/rest-cli:17.06.0-rc1
-  luma_image: &luma_image onedata/luma:18.02.0-beta2
+  enabled: *deployment_enabled
+  oz_image: &oz_image onedata/onezone:18.02.0-rc7
+  op_image: &op_image onedata/oneprovider:18.02.0-rc7
+  oc_image: &oc_image onedata/oneclient:18.02.0-rc7
+  cli_image: &cli_image onedata/rest-cli:18.02.0-rc7
+  luma_image: &luma_image docker.onedata.org/luma:ID-8e2da56615
 
   log_level: &log_level "info"
   onepanel_batch_mode_enabled: &onepanel_batch_mode_enabled true
@@ -452,7 +587,7 @@ onedata-3p:
     databases: [ ]
 
   oneprovidersPanelOverlayConfig: &oneprovidersPanelOverlayConfig |-
-    [].
+    [{onepanel, [{connect_to_onezone_attempts, 30}]}].
   oneprovidersWorkerOverlayConfig: &oneprovidersWorkerOverlayConfig |-
     [].
 
@@ -460,7 +595,7 @@ onedata-3p:
   onedata_cli_enabled: &onedata_cli_enabled true
 
   luma_enabled: &luma_enabled true 
- 
+
   posix_enabled: &posix_enabled true
   s3_enabled: &s3_enabled true
   ceph_enabled: &ceph_enabled true
@@ -468,7 +603,7 @@ onedata-3p:
   gluster_enabled: &gluster_enabled true
   swift_enabled: &swift_enabled false
  
-  volume_data_sync_enabled: &volume_data_sync_enabled true
+  volume_data_sync_enabled: &volume_data_sync_enabled false
 
   # Explicately wait for onezone pod to enter ready state before starting oneproviders
   wait-for-onezone-enabled: &wait-for-onezone-enabled false
@@ -502,35 +637,18 @@ onedata-3p:
     image: *luma_image
     lumaCacheTimeout: 5
     lumaApiKey: example_api_key
-
     posix:
-      enabled: &luma_enabled_posix false
-      lowest_uid: 1000
-      highest_uid: 65536
-      
+      enabled: &luma_enabled_posix true
     s3:
       enabled: &luma_enabled_s3 false
-      access_key: accessKey
-      secret_key: verySecretKey
-
     ceph:
       enabled: &luma_enabled_ceph false
-      pool_name: test
-      username: client.k8s
-      key: AQC1oSZZZfucFxAA34MekwoWBm7qpGd0A8u
-
     swift:
       enabled: &luma_enabled_swift false
-      username: swift
-      password: swift
-
     gluster:
       enabled: &luma_enabled_gluster false
-
     nfs:
       enabled: &luma_enabled_nfs false
-      lowest_uid: 1000
-      highest_uid: 65536
 
   # Onezone configuration
   onezone:
@@ -545,17 +663,36 @@ onedata-3p:
       workers: [ ]
       databases: [ ]
     saml-idp:
-      enabled: &idp_enabled true
+      enabled: &idp_enabled false
       generate-certificates: 
         enabled: true
     panelOverlayConfig: |-
       [].
     workerOverlayConfig: |-
       [].
-    onepanel_admin_users: &onepanel_admin_users
-      - name: admin
-        password: password
+
+    onezone_main_admin: &onezone_main_admin
+      name: admin
+      password: password
+    onezoneAdmin: *onezone_main_admin
+
     onepanel_users: *all_users
+
+    keycloak: &keycloak
+      users: *all_users
+      groups: *all_groups
+      idpName: rhea
+      tokenPrefix: onedata
+      appId: onedata
+      voGroupId: Onedata-Keycloak-1
+      superGroup: vo:HNSciCloud-RHEA/rl:one-data-special-role
+      init:
+        enable: true
+        adminUsername: admin
+        adminPassword: password
+        realmId: onedata
+        clientName: onedata
+        publishClientSecret: true
 
   # What follows are the providers configurations for providers designated as:
   # krakow, paris, and lisbon
@@ -585,15 +722,25 @@ onedata-3p:
 
     luma:
       suffix: *op1s
-      image: *luma_image
-      enabled: true
-      lumaCacheTimeout: 5
-      lumaApiKey: example_api_key
+      << : *luma_global
 
     volume-data-sync:
-      enabled: *volume_data_sync_enabled
-      volume-data-sync-rw-luma:
-        luma-enabled: true #*luma_enabled_posix
+      enabled: true #*volume_data_sync_enabled
+      volumes:
+      - name: volume-data-sync-rw
+        luma-enabled: *luma_enabled_posix
+        image: onedata/eo-data-mock:Landsat-5-sample-latest
+        imagePullPolicy: IfNotPresent
+        dataPath: /data
+        readOnly: false
+      - name: volume-data-sync-ro
+        luma-enabled: *luma_enabled_posix
+        image: onedata/eo-data-mock:Landsat-5-sample-latest
+        imagePullPolicy: IfNotPresent
+        dataPath: /data
+        readOnly: true
+      - name: volume-data-sync-rw-luma
+        luma-enabled: *luma_enabled_posix
         image: onedata/eo-data-mock:Landsat-5-sample-latest
         imagePullPolicy: IfNotPresent
         dataPath: /data
@@ -614,9 +761,9 @@ onedata-3p:
     oneclient:
       image: *oc_image
       debug_mode: *oneclients_debug_mode_enabled
-      enabled: true # *oneclients_enabled
+      enabled: *oneclients_enabled
       suffix: *op1s
-      user: *user_joe
+      users: *all_users
       onedata_cli:
         image: *cli_image
     onedata-cli:
@@ -686,7 +833,7 @@ onedata-3p:
       debug_mode: *oneclients_debug_mode_enabled
       enabled: *oneclients_enabled
       suffix: *op2s
-      user: *user_joe
+      users: *all_users
       onedata_cli:
         image: *cli_image
     onedata-cli:
@@ -756,7 +903,7 @@ onedata-3p:
       debug_mode: *oneclients_debug_mode_enabled
       enabled: *oneclients_enabled
       suffix: *op3s
-      user: *user_joe
+      users: *all_users
       onedata_cli:
         image: *cli_image
     onedata-cli:
