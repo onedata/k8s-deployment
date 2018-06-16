@@ -248,7 +248,7 @@ users: &all_users
         onezoneLogin: false
     password: password
     email: marie@example.com
-    oneclient: *allOneproviders
+    oneclient: []
     luma:
       - name: krakow
         storages:
