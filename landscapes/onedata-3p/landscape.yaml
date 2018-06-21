@@ -5,6 +5,7 @@ global:
   region: dev
   tld: onedata.uk.to
   imagePullPolicy: "Always"
+  #hostNetwork: true
 
 oneprovider-krakow:
   enabled: true
