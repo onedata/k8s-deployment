@@ -688,7 +688,7 @@ onedata-3p:
       voGroupId: Onedata-Keycloak-1
       superGroup: vo:HNSciCloud-RHEA/rl:one-data-special-role
       init:
-        enable: true
+        enabled: true
         adminUsername: admin
         adminPassword: password
         realmId: onedata
