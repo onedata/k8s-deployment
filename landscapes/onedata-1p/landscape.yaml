@@ -544,6 +544,7 @@ onedata-3p:
       enabled: &idp_enabled false
       generate-certificates: 
         enabled: true
+    onedata_anti_affinity_enabled: *onedata_anti_affinity_enabled
     panelOverlayConfig: |-
       [].
     workerOverlayConfig: |-
@@ -585,6 +586,8 @@ onedata-3p:
     log_level: *log_level
     nameOverride: oneprovider
     wait-for-onezone: *wait-for-onezone-enabled
+
+    onedata_anti_affinity_enabled: *onedata_anti_affinity_enabled
 
     oneprovider_nodes_count: *oneproviders_nodes_count
     cluster_config: *oneprovider_cluster_configs
