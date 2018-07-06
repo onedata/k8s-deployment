@@ -269,6 +269,24 @@ users: &all_users
     email: user@example.com
     oneclient: []
 
+groups_graph:
+  - parent: *group_alpha
+    privileges: *all_group_privileges
+    children: [ *group_beta, *group_gamma, *group_delta ]
+  - parent: *group_beta
+    privileges: *all_group_privileges
+    children: [ *group_alpha, *group_gamma, *group_delta ]
+  - parent: *group_gamma
+    privileges: *all_group_privileges
+    children: [ *group_alpha, *group_beta, *group_delta ]
+  - parent: *group_delta
+    privileges: *all_group_privileges
+    children: [ *group_alpha, *group_beta, *group_gamma ]
+    # Connect keycloak group with onezone group
+  - parent: *group_alpha
+    privileges: *all_group_privileges
+    children: [ *group_un ]
+
 spaces:
   - name: "krk-p"
     # TODO: change to owner
