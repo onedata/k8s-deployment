@@ -422,6 +422,8 @@ spaces:
 # https://github.com/kubernetes/helm/issues/2479]
 saml-idp:
   enabled: *idp_enabled
+keycloak:
+  enabled: *keycloak_enabled
 luma:
   enabled: *luma_enabled
 oneclient:
@@ -440,7 +442,7 @@ volume-swift:
   enabled: *swift_enabled
 volume-data-sync:
   enabled: *volume_data_sync_enabled
-
+  
 onedata-3p: 
   enabled: *deployment_enabled
   oz_image: &oz_image onedata/onezone:18.02.0-rc7
@@ -555,6 +557,7 @@ onedata-3p:
     onepanel_users: *all_users
       
     keycloak: &keycloak
+      enabled: &keycloak_enabled true
       users: *all_users
       groups: *all_groups
       idpName: rhea

@@ -547,6 +547,8 @@ spaces:
 # https://github.com/kubernetes/helm/issues/2479]
 saml-idp:
   enabled: *idp_enabled
+keycloak:
+  enabled: *keycloak_enabled
 luma:
   enabled: *luma_enabled
 oneclient:
@@ -680,6 +682,7 @@ onedata-3p:
     onepanel_users: *all_users
 
     keycloak: &keycloak
+      enabled: &keycloak_enabled true 
       users: *all_users
       groups: *all_groups
       idpName: rhea
