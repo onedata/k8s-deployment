@@ -285,7 +285,7 @@ spaces:
     # TODO: change to supportedby
     supports:
       - provider: "krakow"
-        storage_name: "ceph"
+        storage_name: "s3"
         size: '1073741824'
   - name: "par-n"
     user: *user_joe
