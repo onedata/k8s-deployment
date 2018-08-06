@@ -57,6 +57,7 @@ windows:
   layout: even-vertical
   shell_command_before:
     - export release_name=$release_name
+    - export namespace=$namespace
   panes:
     - shell_command:
         - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-onezone,release=${release_name},onedata-service=onezone" -o name  | cut -d '/' -f 2) bash
