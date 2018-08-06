@@ -256,18 +256,6 @@ users: &all_users
         - name: posix
           uid: 50002
           gid: 51002
-  # TODO: to remove this user, change how reddiness of onezone is detected
-  - &user_user
-    name: user
-    firstName: user
-    lastName: user
-    idps:
-      onepanel:
-        type: regular
-        enabled: true
-    password: password
-    email: user@example.com
-    oneclient: []
 
 groups_graph:
   - parent: *group_alpha
