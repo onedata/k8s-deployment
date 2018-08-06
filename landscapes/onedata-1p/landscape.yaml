@@ -420,6 +420,8 @@ spaces:
 
 # Those variables are the unfortunate necessity of an issue discussed here:
 # https://github.com/kubernetes/helm/issues/2479]
+token-dispenser:
+  enabled: *token_dispenser_enabled
 saml-idp:
   enabled: *idp_enabled
 keycloak:
@@ -557,6 +559,9 @@ onedata-3p:
 
     onepanel_users: *all_users
       
+    token-dispenser:
+      enabled: &token_dispenser_enabled true
+
     keycloak: &keycloak
       enabled: &keycloak_enabled true
       users: *all_users
