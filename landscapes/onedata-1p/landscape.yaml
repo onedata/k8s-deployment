@@ -603,13 +603,18 @@ onedata-3p:
       enabled: true #*volume_data_sync_enabled
       volumes:
       - name: volume-data-sync-rw
-        luma-enabled: *luma_enabled_posix
+        luma-enabled: false
         image: onedata/eo-data-mock:Landsat-5-sample-latest
         imagePullPolicy: IfNotPresent
         dataPath: /data
         readOnly: false
+        permissions: 
+          - path: Landsat-5
+            # chmod -R command parameters
+            # the root of the path is dataPath
+            mask: 777
       - name: volume-data-sync-ro
-        luma-enabled: *luma_enabled_posix
+        luma-enabled: false
         image: onedata/eo-data-mock:Landsat-5-sample-latest
         imagePullPolicy: IfNotPresent
         dataPath: /data
@@ -620,10 +625,10 @@ onedata-3p:
         imagePullPolicy: IfNotPresent
         dataPath: /data
         readOnly: false
-        chowns: 
-        # chown -R command parameters
-        # the root of the path is dataPath
+        permissions: 
           - path: Landsat-5
+            # chown -R command parameters
+            # the root of the path is dataPath
             user: 40001 #admin
             group: 42001 #alpha
           - path: Landsat-5/TM/L1T/2010/06/13
