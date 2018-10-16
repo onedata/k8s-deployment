@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 BAMBOO_URL="https://bamboo.plgrid.pl"
+BABBOO_CACHE_FILE="bamboo_images_cache"
 BAMBOO_CREDENTIALS_FILE="bamboo"
 
 command_exists() {
@@ -33,6 +34,22 @@ download_artefact() {
   local build_number="$1"
   local branch_number="$2"
   local artefact=""
+
+  touch $BABBOO_CACHE_FILE ;
+  if [[ -n ${bamboo_cache+x} ]] ; then
+    read cbranch_number cbuild_number cbamboo_oz_image cbamboo_op_image cbamboo_oc_image cbamboo_cli_image cbamboo_luma_image < <(grep "^$branch_number $build_number" ./bamboo_images_cache)
+    if [[ "$cbamboo_oz_image" != "" ]] && [[ "$cbamboo_op_image" != "" ]] && [[ "$cbamboo_oc_image" != "" ]] && [[ "$cbamboo_cli_image" != "" ]] && [[ "$cbamboo_luma_image" != "" ]] ; then
+      export bamboo_oz_image=$cbamboo_oz_image
+      export bamboo_op_image=$cbamboo_op_image
+      export bamboo_oc_image=$cbamboo_oc_image
+      export bamboo_cli_image=$cbamboo_cli_image
+      export bamboo_luma_image=$cbamboo_luma_image
+      echo "Found images for build_number=$build_number and branch_number=$branch_number in cache."
+      return
+    else
+      echo "Failed to find images for build_number=$build_number and branch_number=$branch_number"
+    fi
+  fi
   echo "Downloading build ${BAMBOO_URL}/browse/ODSRV-K8SD${branch_number}-${build_number}"
   i=0;
   while : ; do
@@ -59,6 +76,10 @@ download_artefact() {
       break
     fi
   done
+  if [[ "$bamboo_oz_image" != "" ]] && [[ "$bamboo_op_image" != "" ]] && [[ "$bamboo_oc_image" != "" ]] && [[ "$bamboo_cli_image" != "" ]] && [[ "$bamboo_luma_image" != "" ]] ; then
+      echo "Saving downloaded build images into ./bamboo_images_cache"
+      cat <(echo "$branch_number $build_number $bamboo_oz_image $bamboo_op_image $bamboo_oc_image $bamboo_cli_image $bamboo_luma_image") <(grep -v "^488 24" bamboo_images_cache) | sponge $BABBOO_CACHE_FILE;
+  fi
 }   
 
 usage() {
@@ -80,6 +101,7 @@ Options:
   --lifetime                 number or hours ([1-9][0-9]*), after which this deployment will be scheduled for deletion
   --bamboo-build             a build number of k8s-deployment build plan https://bamboo.plgrid.pl/browse/ODSRV-K8SD-<build>
   --bamboo-branch            a branch number of k8s-deployment build plan https://bamboo.plgrid.pl/browse/ODSRV-K8SD<branch>
+  --bamboo-cache             search a cache file for builds before connecting to bamboo server
   --user                     set owner of this release (defaults to $USER)
   --rn                       helm release name 
   --ns                       namespace to deploy into
@@ -187,6 +209,9 @@ main() {
           --bamboo-branch)
               bamboo_branch=$2
               shift
+              ;;
+          --bamboo-cache)
+              bamboo_cache=true
               ;;
           --debug)
               helm_debug=true
