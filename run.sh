@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 BAMBOO_URL="https://bamboo.plgrid.pl"
+BAMBOO_CREDENTIALS_FILE="bamboo"
 
 command_exists() {
   command -v "$@" > /dev/null 2>&1
@@ -21,6 +22,7 @@ check_requirements() {
 }
 
 authenticate_with_bamboo() {
+  [ -f "$BAMBOO_CREDENTIALS_FILE" ] && source "$BAMBOO_CREDENTIALS_FILE"  
   echo "Authenticating with bamboo using user PL_USER=$PL_USER"
   [[ -z ${PL_USER+x} ]] && echo "ERROR: please export PL_USER variable. Exiting." && exit 1 ;
   [[ -z ${PL_PASSWORD+x} ]] && echo "ERROR: please export PL_USER variable. Exiting." && exit 1 ;
