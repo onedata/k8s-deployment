@@ -15,11 +15,10 @@ oneprovider-lisbon:
   enabled: true
 
 allOneproviders: &allOneproviders
-  - krakow
-  - lisbon
-  - paris
+  - *op1s 
+  - *op2s
+  - *op3s
 
-keycloakInstance: *keycloak
 deployment_enabled: &deployment_enabled true
 
 groups: &all_groups
@@ -119,8 +118,9 @@ users: &all_users
     lastName: Morgan
     idps:
       onepanel:
-        type: regular
         enabled: true
+        type: regular
+        mode: config
     password: password
     email: joe@example.com
     oneclient: *allOneproviders
@@ -157,8 +157,9 @@ users: &all_users
     lastName: Doe
     idps:
       onepanel:
-        type: regular
         enabled: true
+        type: regular
+        mode: config
     password: password
     email: tom@example.com
     oneclient: *allOneproviders
@@ -177,8 +178,9 @@ users: &all_users
     lastName: Rayan
     idps:
       onepanel:
-        type: regular
         enabled: true
+        type: regular
+        mode: config
     password: password
     email: meg@example.com
     oneclient: *allOneproviders
@@ -198,8 +200,9 @@ users: &all_users
     lastName: Fisher
     idps:
       onepanel:
-        type: regular
         enabled: true
+        type: regular
+        mode: config
     password: password
     email: karen@example.com
     oneclient: *allOneproviders
@@ -572,6 +575,7 @@ onedata-3p:
   onedata_anti_affinity_enabled: &onedata_anti_affinity_enabled true
 
   oneproviders_generate_certificates: &oneproviders_generate_certificates true
+  onedata_persistence: &onedata_persistence false
 
   oneproviders_nodes_count: &oneproviders_nodes_count 1
   oneprovider_cluster_configs: &oneprovider_cluster_configs
@@ -585,6 +589,9 @@ onedata-3p:
     [].
 
   oneclients_enabled: &oneclients_enabled true
+  oneclientFlags: &oneclientFlags --force-direct-io --force-fullblock-read
+  oneclientDirectIOEnabled: &oneclientDirectIOEnabled true
+
   onedata_cli_enabled: &onedata_cli_enabled true
 
   luma_enabled: &luma_enabled true 
@@ -650,6 +657,8 @@ onedata-3p:
     log_level: *log_level
     generate-certificates: 
       enabled: true
+    persistence:
+      enabled: *onedata_persistence
     onezone_nodes_count: 1
     cluster_config:
       managers: [ ]
@@ -664,11 +673,6 @@ onedata-3p:
       [].
     workerOverlayConfig: |-
       [].
-
-    onezone_main_admin: &onezone_main_admin
-      name: admin
-      password: password
-    onezoneAdmin: *onezone_main_admin
 
     onepanel_users: *all_users
 
@@ -719,6 +723,8 @@ onedata-3p:
 
     generate-certificates: 
       enabled: *oneproviders_generate_certificates
+    persistence:
+      enabled: *onedata_persistence
 
     luma:
       suffix: *op1s
@@ -771,6 +777,10 @@ onedata-3p:
       users: *all_users
       onedata_cli:
         image: *cli_image
+      oneclientFlags: *oneclientFlags
+      directIO:
+        nfs:
+          enabled: *oneclientDirectIOEnabled
     onedata-cli:
       image: *cli_image
       enabled: *onedata_cli_enabled
@@ -827,6 +837,8 @@ onedata-3p:
 
     generate-certificates: 
       enabled: *oneproviders_generate_certificates
+    persistence:
+      enabled: *onedata_persistence
 
     luma:
       suffix: *op2s
@@ -843,6 +855,10 @@ onedata-3p:
       users: *all_users
       onedata_cli:
         image: *cli_image
+      oneclientFlags: *oneclientFlags
+      directIO:
+        nfs:
+          enabled: *oneclientDirectIOEnabled
     onedata-cli:
       image: *cli_image
       enabled: *onedata_cli_enabled
@@ -899,6 +915,8 @@ onedata-3p:
 
     generate-certificates: 
       enabled: *oneproviders_generate_certificates
+    persistence:
+      enabled: *onedata_persistence
 
     luma:
       suffix: *op3s
@@ -915,6 +933,10 @@ onedata-3p:
       users: *all_users
       onedata_cli:
         image: *cli_image
+      oneclientFlags: *oneclientFlags
+      directIO:
+        nfs:
+          enabled: *oneclientDirectIOEnabled
     onedata-cli:
       image: *cli_image
       enabled: *onedata_cli_enabled

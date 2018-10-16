@@ -117,8 +117,9 @@ users: &all_users
     lastName: Morgan
     idps:
       onepanel:
-        type: regular
         enabled: true
+        type: regular
+        mode: config
     password: password
     email: joe@example.com
     oneclient: *allOneproviders
@@ -155,8 +156,9 @@ users: &all_users
     lastName: Doe
     idps:
       onepanel:
-        type: regular
         enabled: true
+        type: regular
+        mode: config
     password: password
     email: tom@example.com
     oneclient: *allOneproviders
@@ -175,8 +177,9 @@ users: &all_users
     lastName: Rayan
     idps:
       onepanel:
-        type: regular
         enabled: true
+        type: regular
+        mode: config
     password: password
     email: meg@example.com
     oneclient: *allOneproviders
@@ -196,8 +199,9 @@ users: &all_users
     lastName: Fisher
     idps:
       onepanel:
-        type: regular
         enabled: true
+        type: regular
+        mode: config
     password: password
     email: karen@example.com
     oneclient: *allOneproviders
@@ -447,6 +451,7 @@ onedata-3p:
   onedata_anti_affinity_enabled: &onedata_anti_affinity_enabled true
 
   oneproviders_generate_certificates: &oneproviders_generate_certificates true
+  onedata_persistence: &onedata_persistence false
 
   oneproviders_nodes_count: &oneproviders_nodes_count 1
   oneprovider_cluster_configs: &oneprovider_cluster_configs
@@ -460,6 +465,9 @@ onedata-3p:
     [].
 
   oneclients_enabled: &oneclients_enabled true
+  oneclientFlags: &oneclientFlags --force-direct-io --force-fullblock-read
+  oneclientDirectIOEnabled: &oneclientDirectIOEnabled true
+
   onedata_cli_enabled: &onedata_cli_enabled true
 
   luma_enabled: &luma_enabled true 
@@ -525,6 +533,8 @@ onedata-3p:
     log_level: *log_level
     generate-certificates: 
       enabled: true
+    persistence:
+      enabled: *onedata_persistence
     onezone_nodes_count: 1
     cluster_config:
       managers: [ ]
@@ -539,11 +549,6 @@ onedata-3p:
       [].
     workerOverlayConfig: |-
       [].
-
-    onezone_main_admin: &onezone_main_admin
-      name: admin
-      password: password
-    onezoneAdmin: *onezone_main_admin
 
     onepanel_users: *all_users
 
@@ -594,6 +599,8 @@ onedata-3p:
 
     generate-certificates: 
       enabled: *oneproviders_generate_certificates
+    persistence:
+      enabled: *onedata_persistence
 
     luma:
       suffix: *op1s
@@ -612,7 +619,10 @@ onedata-3p:
           - path: Landsat-5
             # chmod -R command parameters
             # the root of the path is dataPath
-            mask: 777
+            mask: 777 # check this in regard to
+            # @here @Michał Wrzeszcz problem, który miał @Michal Orzechowski wynikał z tego, że to wszystko działo sie w syncowanym spaceie
+            # zaimportowany katalog miał złe uprawnienia na storage'u
+            # tzn nie miał write'a
       - name: volume-data-sync-ro
         luma-enabled: false
         image: onedata/eo-data-mock:Landsat-5-sample-latest
@@ -646,6 +656,10 @@ onedata-3p:
       users: *all_users
       onedata_cli:
         image: *cli_image
+      oneclientFlags: *oneclientFlags
+      directIO:
+        nfs:
+          enabled: *oneclientDirectIOEnabled
     onedata-cli:
       image: *cli_image
       enabled: *onedata_cli_enabled
