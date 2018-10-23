@@ -465,7 +465,7 @@ onedata-3p:
     [].
 
   oneclients_enabled: &oneclients_enabled true
-  oneclientFlags: &oneclientFlags --force-direct-io --force-fullblock-read
+  oneclientFlags: &oneclientFlags --force-fullblock-read
   oneclientDirectIOEnabled: &oneclientDirectIOEnabled true
 
   onedata_cli_enabled: &onedata_cli_enabled true
