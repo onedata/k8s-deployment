@@ -15,11 +15,13 @@ oneprovider-lisbon:
   enabled: true
 
 allOneproviders: &allOneproviders
-  - *op1s 
+  - *op1s
   - *op2s
   - *op3s
 
 deployment_enabled: &deployment_enabled true
+
+lumaJobEnabled: true
 
 groups: &all_groups
   - &group_alpha
@@ -739,6 +741,7 @@ onedata-3p:
         imagePullPolicy: IfNotPresent
         dataPath: /data
         readOnly: false
+        mountPermissions: 777
         permissions: 
           - path: Landsat-5
             # chmod -R command parameters
