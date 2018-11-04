@@ -15,10 +15,11 @@ oneprovider-lisbon:
   enabled: false
 
 allOneproviders: &allOneproviders
-  - krakow
+  - *op1s
 
-keycloakInstance: *keycloak
 deployment_enabled: &deployment_enabled true
+
+lumaJobEnabled: true
 
 groups: &all_groups
   - &group_alpha
@@ -615,6 +616,7 @@ onedata-3p:
         imagePullPolicy: IfNotPresent
         dataPath: /data
         readOnly: false
+        mountPermissions: 777
         permissions: 
           - path: Landsat-5
             # chmod -R command parameters
