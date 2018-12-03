@@ -24,9 +24,28 @@ check_requirements() {
 
 authenticate_with_bamboo() {
   [ -f "$BAMBOO_CREDENTIALS_FILE" ] && source "$BAMBOO_CREDENTIALS_FILE"  
-  echo "Authenticating with bamboo using user PL_USER=$PL_USER"
+  if [[ -z ${PL_USER+x} ]] ; then 
+    echo "WARNINING: $BAMBOO_CREDENTIALS_FILE does not contain export of PL_USER, falling back to tty:"
+    printf "Please provider your bamboo username: "
+    read -r PL_USER </dev/tty
+  fi
   [[ -z ${PL_USER+x} ]] && echo "ERROR: please export PL_USER variable. Exiting." && exit 1 ;
-  [[ -z ${PL_PASSWORD+x} ]] && echo "ERROR: please export PL_USER variable. Exiting." && exit 1 ;
+  echo "Authenticating with bamboo using user PL_USER=$PL_USER"
+  if [[ -z ${PL_PASSWORD+x} ]] ; then 
+    echo "WARNINING: $BAMBOO_CREDENTIALS_FILE does not contain export of PL_PASSWORD, falling back to tty:"
+    printf "Please provider your bamboo password: "
+    unset PL_PASSWORD
+    while IFS= read -p "$prompt" -r -s -n 1 _pl_passowrd_char
+    do
+        if [[ ${_pl_passowrd_char} == $'\0' ]]
+        then
+            break
+        fi
+        prompt='*'
+        PL_PASSWORD+="$_pl_passowrd_char"
+    done
+  fi
+  [[ -z ${PL_PASSWORD+x} ]] && echo "ERROR: please export PL_PASSWORD variable. Exiting." && exit 1 ;
   curl --output /dev/null --silent -u "$PL_USER:$PL_PASSWORD" --cookie-jar bamboo_cookie.txt "${BAMBOO_URL}/userlogin!default.action?os_authType=basic" --head
 }
 
