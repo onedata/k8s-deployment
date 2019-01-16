@@ -565,11 +565,11 @@ volume-data-sync:
   
 onedata-3p: 
   enabled: *deployment_enabled
-  oz_image: &oz_image onedata/onezone:18.02.0-rc10
-  op_image: &op_image onedata/oneprovider:18.02.0-rc10
-  oc_image: &oc_image onedata/oneclient:18.02.0-rc10
-  cli_image: &cli_image onedata/rest-cli:18.02.0-rc7
-  luma_image: &luma_image onedata/luma:18.02.0-rc4
+  oz_image: &oz_image onedata/onezone:18.02.0-rc13
+  op_image: &op_image onedata/oneprovider:18.02.0-rc13
+  oc_image: &oc_image onedata/oneclient:18.02.0-rc13
+  cli_image: &cli_image onedata/rest-cli:18.02.0-rc13
+  luma_image: &luma_image onedata/luma:18.02.0-rc10
 
   log_level: &log_level "info"
   onepanel_batch_mode_enabled: &onepanel_batch_mode_enabled true
