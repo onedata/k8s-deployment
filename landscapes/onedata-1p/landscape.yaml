@@ -313,6 +313,12 @@ spaces:
       - provider: "krakow"
         storage_name: "gluster"
         size: '1073741824'
+  - name: "krk-w"
+    user: *user_joe 
+    supports:
+      - provider: "krakow"
+        storage_name: "webdav"
+        size: '1073741824'
   - name: "krk-pirw"
     user: *user_joe
     supports:
@@ -435,6 +441,8 @@ volume-gluster:
   enabled: *gluster_enabled
 volume-swift:
   enabled: *swift_enabled
+volume-webdav:
+  enabled: *webdav_enabled
 volume-data-sync:
   enabled: *volume_data_sync_enabled
   
@@ -479,6 +487,7 @@ onedata-3p:
   nfs_enabled: &nfs_enabled true
   gluster_enabled: &gluster_enabled true
   swift_enabled: &swift_enabled false
+  webdav_enabled: &webdav_enabled true
 
   volume_data_sync_enabled: &volume_data_sync_enabled true
 
@@ -526,6 +535,8 @@ onedata-3p:
       enabled: &luma_enabled_gluster false
     nfs:
       enabled: &luma_enabled_nfs false
+    wevdav:
+      enabled: &luma_enabled_webdav false
 
   # Onezone configuration
   onezone:
@@ -694,6 +705,10 @@ onedata-3p:
       enabled: *swift_enabled
       suffix: *op1s
       luma-enabled: *luma_enabled_swift
+    volume-webdav:
+      enabled: *webdav_enabled
+      suffix: *op1s
+      luma-enabled: *luma_enabled_webdav
       
     external-storages:
       << : *external-storages
