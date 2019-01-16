@@ -292,6 +292,22 @@ main() {
     if [[ "$cli_image" != "" ]]; then cli_image=${image_prefix}$cli_image ; else cli_image="$bamboo_cli_image" ; fi
     if [[ "$luma_image" != "" ]]; then luma_image=${image_prefix}$luma_image ; else luma_image="$bamboo_luma_image" ; fi
 
+    default_image=0
+    [[ "$oz_image" = "" ]] && echo "Error: Missing Onezone image! The default image will be used!" && default_image=1
+    [[ "$op_image" = "" ]] && echo "Error: Missing Oneprovider image! The default image will be used!" && default_image=1
+    [[ "$oc_image" = "" ]] && echo "Error: Missing Oneclient image! The default image will be used!" && default_image=1
+    [[ "$cli_image" = "" ]] && echo "Error: Missing Onedata-cli image! The default image will be used!" && default_image=1
+    [[ "$luma_image" = "" ]] && echo "Error: Missing Luma image! The default image will be used!" && default_image=1
+    
+    if [[ "$default_image" = "1" ]] ; then
+        read -p "Do you reall want to use default image values? " default_image_yn
+        case $default_image_yn in
+            [Yy]* ) ;;
+            [Nn]* ) exit ;;
+            * ) echo "Please answer yes(y) or no(n)." ;;
+        esac
+    fi
+
     export kube_config="$kube_config"
     export namespace=$namespace
     export release_name="$release_name"
