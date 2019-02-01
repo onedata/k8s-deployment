@@ -4,6 +4,18 @@ BAMBOO_URL="https://bamboo.plgrid.pl"
 BABBOO_CACHE_FILE="bamboo_images_cache"
 BAMBOO_CREDENTIALS_FILE="bamboo"
 
+aliases() {
+  case $( uname -s ) in
+    Linux)
+          _sed=sed
+          ;;
+    Darwin)
+          _sed=gsed
+          ;;
+  esac
+}
+aliases
+
 command_exists() {
   command -v "$@" > /dev/null 2>&1
 }
@@ -327,7 +339,7 @@ main() {
 
     type docker-compose >/dev/null 2>&1 || {
         echo >&2 "I require docker-compose but it's not installed. Downloading..." ;
-        curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > docker-compose
+        curl -L https://github.com/docker/compose/releases/download/1.23.2/docker-compose-`uname -s`-`uname -m` > docker-compose
         chmod +x docker-compose
         export PATH=$PATH:.
     }
@@ -335,12 +347,14 @@ main() {
     docker_compose_dir="docker/run/"
     local_copy_of_docker_compose_yaml=$(cat $docker_compose_dir/docker-compose.yaml)
     if [[ $helm_local_charts_dir != "" ]]; then
-        local_copy_of_docker_compose_yaml=$(echo "$local_copy_of_docker_compose_yaml" | sed  -e 's#volumes:#volumes:\n      - ${helm_local_dir}:/root/.helm_ro:ro#g')
-        local_copy_of_docker_compose_yaml=$(echo "$local_copy_of_docker_compose_yaml" | sed  -e 's#volumes:#volumes:\n      - ${helm_local_charts_dir}:/root/charts:ro#g')
+        local_copy_of_docker_compose_yaml=$(echo "$local_copy_of_docker_compose_yaml" | $_sed  -e 's#volumes:#volumes:\n      - ${helm_local_dir}:/root/.helm_ro:ro#g')
+        local_copy_of_docker_compose_yaml=$(echo "$local_copy_of_docker_compose_yaml" | $_sed  -e 's#volumes:#volumes:\n      - ${helm_local_charts_dir}:/root/charts:ro#g')
     fi 
-
+    echo "b"
+    echo "$local_copy_of_docker_compose_yaml"
     docker-compose -f <(echo "$local_copy_of_docker_compose_yaml") --project-directory "$docker_compose_dir" config
     docker-compose -f <(echo "$local_copy_of_docker_compose_yaml") --project-directory "$docker_compose_dir" up --force-recreate
+    echo "a"
 
     container_id=$(docker-compose -f <(echo "$local_copy_of_docker_compose_yaml")  --project-directory "$docker_compose_dir" ps -q 2>/dev/null)
     container_envs=$(docker inspect $container_id | jq -r '.[0].Config.Env[]')
