@@ -64,6 +64,7 @@ groups: &all_groups
       keycloak:
         children: [ *group_deux  ]
         enabled: true
+        mode: duringKeycloakDeployment
     posix:
       gid: 60001
   - &group_deux
@@ -73,6 +74,7 @@ groups: &all_groups
         children: [ *group_trois ]
         child: true
         enabled: true
+        mode: duringKeycloakDeployment
     posix:
       gid: 60002
   - &group_trois
@@ -82,6 +84,7 @@ groups: &all_groups
         users: [ *user_marie, *user_pier ]
         child: true
         enabled: true
+        mode: duringKeycloakDeployment
     posix:
       gid: 60003
 
@@ -226,6 +229,7 @@ users: &all_users
       keycloak:
         enabled: true
         onezoneLogin: true
+        mode: duringKeycloakDeployment
     password: password
     email: pier@example.com
     oneclient: []
@@ -254,6 +258,7 @@ users: &all_users
       keycloak:
         enabled: true
         onezoneLogin: false
+        mode: duringKeycloakDeployment
     password: password
     email: marie@example.com
     oneclient: *allOneproviders
@@ -310,6 +315,18 @@ spaces:
       - provider: "krakow"
         storage_name: "webdav"
         size: '1073741824'
+  - name: "par-wi"
+    user: *user_joe 
+    supports:
+      - provider: "paris"
+        storage_name: "webdav"
+        size: '1073741824'
+        mountInRoot: true
+        import:
+          strategy: "simple_scan"
+        update:
+          strategy: "simple_scan"
+          deleteEnable: true
   - name: "krk-n-par-3"
     user: *user_joe
     supports:
@@ -550,6 +567,8 @@ saml-idp:
   enabled: *idp_enabled
 keycloak:
   enabled: *keycloak_enabled
+elasticsearch:
+  enabled: *elasticsearch_enabled
 luma:
   enabled: *luma_enabled
 oneclient:
@@ -568,8 +587,6 @@ volume-swift:
   enabled: *swift_enabled
 volume-webdav:
   enabled: *webdav_enabled
-volume-data-sync:
-  enabled: *volume_data_sync_enabled
   
 onedata-3p: 
   enabled: *deployment_enabled
@@ -614,8 +631,6 @@ onedata-3p:
   swift_enabled: &swift_enabled false
   webdav_enabled: &webdav_enabled true
  
-  volume_data_sync_enabled: &volume_data_sync_enabled false
-
   # Explicately wait for onezone pod to enter ready state before starting oneproviders
   wait-for-onezone-enabled: &wait-for-onezone-enabled false
 
@@ -695,6 +710,9 @@ onedata-3p:
 
     token-dispenser:
       enabled: &token_dispenser_enabled true
+      
+    elasticsearch:
+      enabled: &elasticsearch_enabled true
     
     keycloak: &keycloak
       enabled: &keycloak_enabled true 
@@ -749,7 +767,7 @@ onedata-3p:
       << : *luma_global
 
     volume-data-sync:
-      enabled: true #*volume_data_sync_enabled
+      enabled: true
       volumes:
       - name: volume-data-sync-rw
         luma-enabled: false
@@ -868,9 +886,6 @@ onedata-3p:
       suffix: *op2s
       << : *luma_global
 
-    volume-data-sync:
-      enabled: *volume_data_sync_enabled
-
     oneclient:
       image: *oc_image
       debug_mode: *oneclients_debug_mode_enabled
@@ -914,6 +929,8 @@ onedata-3p:
       enabled: *webdav_enabled
       suffix: *op2s
       luma-enabled: *luma_enabled_webdav
+      volume-data-sync:
+        enabled: true
 
     external-storages:
       << : *external-storages
@@ -950,9 +967,6 @@ onedata-3p:
     luma:
       suffix: *op3s
       << : *luma_global
-      
-    volume-data-sync:
-      enabled: *volume_data_sync_enabled
       
     oneclient:
       image: *oc_image
