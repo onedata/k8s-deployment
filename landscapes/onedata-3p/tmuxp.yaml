@@ -8,21 +8,21 @@ windows:
   panes:
     - shell_command:
         - export PROVIDER_ID=-krakow    
-        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) bash
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},component=oneprovider" -o name  | cut -d '/' -f 2) bash
         - apt update
         - apt install -y htop
         - export TERM=xterm
         - htop
     - shell_command:
         - export PROVIDER_ID=-paris
-        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) bash
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},component=oneprovider" -o name  | cut -d '/' -f 2) bash
         - apt update
         - apt install -y htop
         - export TERM=xterm
         - htop
     - shell_command:
         - export PROVIDER_ID=-lisbon
-        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) bash
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},component=oneprovider" -o name  | cut -d '/' -f 2) bash
         - apt update
         - apt install -y htop
         - export TERM=xterm
@@ -36,20 +36,20 @@ windows:
   panes:
     - shell_command:
         - export PROVIDER_ID=-krakow
-        - kubectl port-forward -n $namespace $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) 18091:8091 &
-        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) bash
+        - kubectl port-forward -n $namespace $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},component=oneprovider" -o name  | cut -d '/' -f 2) 18091:8091 &
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},component=oneprovider" -o name  | cut -d '/' -f 2) bash
         - pkill  -f "/usr/lib/op_worker/erts-8.2/bin/to_erl /tmp/op_worker/"
         - op_worker attach-direct
     - shell_command:
         - export PROVIDER_ID=-paris
-        - kubectl port-forward -n $namespace $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) 28091:8091 &
-        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) bash
+        - kubectl port-forward -n $namespace $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},component=oneprovider" -o name  | cut -d '/' -f 2) 28091:8091 &
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},component=oneprovider" -o name  | cut -d '/' -f 2) bash
         - pkill  -f "/usr/lib/op_worker/erts-8.2/bin/to_erl /tmp/op_worker/"
         - op_worker attach-direct
     - shell_command:
         - export PROVIDER_ID=-lisbon
-        - kubectl port-forward -n $namespace $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) 38091:8091 &
-        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},onedata-service=oneprovider" -o name  | cut -d '/' -f 2) bash
+        - kubectl port-forward -n $namespace $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},component=oneprovider" -o name  | cut -d '/' -f 2) 38091:8091 &
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-oneprovider${PROVIDER_ID},release=${release_name},component=oneprovider" -o name  | cut -d '/' -f 2) bash
         - pkill  -f "/usr/lib/op_worker/erts-8.2/bin/to_erl /tmp/op_worker/"
         - op_worker attach-direct
 
@@ -60,13 +60,13 @@ windows:
     - export namespace=$namespace
   panes:
     - shell_command:
-        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-onezone,release=${release_name},onedata-service=onezone" -o name  | cut -d '/' -f 2) bash
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-onezone,release=${release_name},component=onezone" -o name  | cut -d '/' -f 2) bash
         - apt update
         - apt install -y htop
         - export TERM=xterm
         - htop
     - shell_command:
-        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-onezone,release=${release_name},onedata-service=onezone" -o name  | cut -d '/' -f 2) bash
+        - kubectl -n $namespace exec -it $(kubectl -n $namespace get pod -l"app=${release_name}-onezone,release=${release_name},component=onezone" -o name  | cut -d '/' -f 2) bash
         - pkill  -f "/usr/lib/oz_worker/erts-8.2/bin/to_erl /tmp/oz_worker/"
         - oz_worker attach-direct
 
