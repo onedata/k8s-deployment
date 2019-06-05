@@ -289,13 +289,30 @@ groups_graph:
 
 spaces:
   # Proper spaces
-  - name: "krk-3"
+  - &krk_p
+    name: "krk-p"
     # TODO: change to owner
     user: *user_joe
     # TODO: change to supportedby
+    users:
+      - user: *user_tom
+        privileges: *all_space_privileges
+      - user: *user_meg
+        privileges: *all_space_privileges
+      - user: *user_karen
+        privileges: *all_space_privileges
+    groups:
+      - group: *group_alpha
+        privileges: *all_space_privileges
+      - group: *group_beta
+        privileges: *all_space_privileges
+      - group: *group_gamma
+        privileges: *all_space_privileges
+      - group: *group_delta
+        privileges: *all_space_privileges
     supports:
       - provider: "krakow"
-        storage_name: "s3"
+        storage_name: "posix"
         size: '1073741824'
   - name: "par-n"
     user: *user_joe
@@ -320,6 +337,18 @@ spaces:
     supports:
       - provider: "paris"
         storage_name: "webdav"
+        size: '1073741824'
+        mountInRoot: true
+        import:
+          strategy: "simple_scan"
+        update:
+          strategy: "simple_scan"
+          deleteEnable: true
+  - name: "krk-di"
+    user: *user_joe 
+    supports:
+      - provider: "krakow"
+        storage_name: "dcache"
         size: '1073741824'
         mountInRoot: true
         import:
@@ -375,6 +404,22 @@ spaces:
   # Proper spaces with import
   - name: "krk-pirw-par-3-lis-n"
     user: *user_joe
+    users:
+      - user: *user_tom
+        privileges: *all_space_privileges
+      - user: *user_meg
+        privileges: *all_space_privileges
+      - user: *user_karen
+        privileges: *all_space_privileges
+    groups:
+      - group: *group_alpha
+        privileges: *all_space_privileges
+      - group: *group_beta
+        privileges: *all_space_privileges
+      - group: *group_gamma
+        privileges: *all_space_privileges
+      - group: *group_delta
+        privileges: *all_space_privileges
     supports:
       - provider: "krakow"
         storage_name: "volume-data-sync-rw"
@@ -573,6 +618,8 @@ luma:
   enabled: *luma_enabled
 oneclient:
   enabled: *oneclients_enabled
+jupyter-notebook:
+  enabled: *jupyter_notebook_enabled
 onedata-cli:
   enabled: *onedata_cli_enabled
 volume-s3:
@@ -587,6 +634,8 @@ volume-swift:
   enabled: *swift_enabled
 volume-webdav:
   enabled: *webdav_enabled
+volume-dcache:
+  enabled: *dcache_enabled
   
 onedata-3p: 
   enabled: *deployment_enabled
@@ -623,6 +672,8 @@ onedata-3p:
 
   luma_enabled: &luma_enabled true 
 
+  jupyter_notebook_enabled: &jupyter_notebook_enabled true
+
   posix_enabled: &posix_enabled true
   s3_enabled: &s3_enabled true
   ceph_enabled: &ceph_enabled true
@@ -630,6 +681,7 @@ onedata-3p:
   gluster_enabled: &gluster_enabled true
   swift_enabled: &swift_enabled false
   webdav_enabled: &webdav_enabled true
+  dcache_enabled: &dcache_enabled true
  
   # Explicately wait for onezone pod to enter ready state before starting oneproviders
   wait-for-onezone-enabled: &wait-for-onezone-enabled false
@@ -664,7 +716,7 @@ onedata-3p:
     lumaCacheTimeout: 5
     lumaApiKey: example_api_key
     posix:
-      enabled: &luma_enabled_posix true
+      enabled: &luma_enabled_posix false
     s3:
       enabled: &luma_enabled_s3 false
     ceph:
@@ -788,7 +840,7 @@ onedata-3p:
         dataPath: /data
         readOnly: true
       - name: volume-data-sync-rw-luma
-        luma-enabled: *luma_enabled_posix
+        luma-enabled: true
         image: onedata/eo-data-mock:Landsat-5-sample-latest
         imagePullPolicy: IfNotPresent
         dataPath: /data
@@ -818,6 +870,14 @@ onedata-3p:
       directIO:
         nfs:
           enabled: *oneclientDirectIOEnabled
+      jupyter:
+        enabled: true
+    jupyter-notebook:
+      enabled: *jupyter_notebook_enabled
+      suffix: *op1s
+      user:
+        << : *user_joe
+      space: *krk_p
     onedata-cli:
       image: *cli_image
       enabled: *onedata_cli_enabled
@@ -847,6 +907,10 @@ onedata-3p:
       luma-enabled: *luma_enabled_swift
     volume-webdav:
       enabled: *webdav_enabled
+      suffix: *op1s
+      luma-enabled: *luma_enabled_webdav
+    volume-dcache:
+      enabled: *dcache_enabled
       suffix: *op1s
       luma-enabled: *luma_enabled_webdav
 
@@ -898,6 +962,14 @@ onedata-3p:
       directIO:
         nfs:
           enabled: *oneclientDirectIOEnabled
+      jupyter:
+        enabled: true
+    jupyter-notebook:
+      enabled: *jupyter_notebook_enabled
+      suffix: *op2s
+      user:
+        << : *user_joe
+      space: *krk_p
     onedata-cli:
       image: *cli_image
       enabled: *onedata_cli_enabled
@@ -931,6 +1003,10 @@ onedata-3p:
       luma-enabled: *luma_enabled_webdav
       volume-data-sync:
         enabled: true
+    volume-dcache:
+      enabled: *dcache_enabled
+      suffix: *op2s
+      luma-enabled: *luma_enabled_webdav
 
     external-storages:
       << : *external-storages
@@ -967,7 +1043,7 @@ onedata-3p:
     luma:
       suffix: *op3s
       << : *luma_global
-      
+
     oneclient:
       image: *oc_image
       debug_mode: *oneclients_debug_mode_enabled
@@ -980,6 +1056,14 @@ onedata-3p:
       directIO:
         nfs:
           enabled: *oneclientDirectIOEnabled
+      jupyter:
+        enabled: true
+    jupyter-notebook:
+      enabled: *jupyter_notebook_enabled
+      suffix: *op3s
+      user:
+        << : *user_joe
+      space: *krk_p
     onedata-cli:
       image: *cli_image
       enabled: *onedata_cli_enabled
@@ -1009,6 +1093,10 @@ onedata-3p:
       luma-enabled: *luma_enabled_swift
     volume-webdav:
       enabled: *webdav_enabled
+      suffix: *op3s
+      luma-enabled: *luma_enabled_webdav
+    volume-dcache:
+      enabled: *dcache_enabled
       suffix: *op3s
       luma-enabled: *luma_enabled_webdav
 
