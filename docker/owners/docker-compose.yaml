@@ -2,7 +2,7 @@ version: '3'
 
 services:
   landscaper:
-    image: onedata/landscaper:v2.8.0-2
+    image: onedata/landscaper:v2.13.1-1
     entrypoint: /entrypoint.sh
     volumes:
       - ./entrypoint.sh:/entrypoint.sh:ro
