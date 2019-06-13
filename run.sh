@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-BAMBOO_URL="https://bamboo.plgrid.pl"
+BAMBOO_URL="https://bamboo.onedata.org"
 BABBOO_CACHE_FILE="bamboo_images_cache"
 BAMBOO_CREDENTIALS_FILE="bamboo"
 
@@ -58,7 +58,7 @@ authenticate_with_bamboo() {
     done
   fi
   [[ -z ${PL_PASSWORD+x} ]] && echo "ERROR: please export PL_PASSWORD variable. Exiting." && exit 1 ;
-  curl --output /dev/null --silent -u "$PL_USER:$PL_PASSWORD" --cookie-jar bamboo_cookie.txt "${BAMBOO_URL}/userlogin!default.action?os_authType=basic" --head
+  curl -vv --silent -u "$PL_USER:$PL_PASSWORD" --cookie-jar bamboo_cookie.txt "${BAMBOO_URL}/userlogin!default.action?os_authType=basic" --head
 }
 
 download_artefact() {
