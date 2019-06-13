@@ -68,6 +68,8 @@ download_artefact() {
 
   touch $BABBOO_CACHE_FILE ;
   if [[ -n ${bamboo_cache+x} ]] ; then
+    # Substitute a lack of branch_number with 0, so cache does not have an empty column
+    [[ "$branch_number" = "" ]] && branch_number=0
     read cbranch_number cbuild_number cbamboo_oz_image cbamboo_op_image cbamboo_oc_image cbamboo_cli_image cbamboo_luma_image < <(grep "^$branch_number $build_number" ./bamboo_images_cache)
     if [[ "$cbamboo_oz_image" != "" ]] && [[ "$cbamboo_op_image" != "" ]] && [[ "$cbamboo_oc_image" != "" ]] && [[ "$cbamboo_cli_image" != "" ]] && [[ "$cbamboo_luma_image" != "" ]] ; then
       export bamboo_oz_image=$cbamboo_oz_image
@@ -75,6 +77,8 @@ download_artefact() {
       export bamboo_oc_image=$cbamboo_oc_image
       export bamboo_cli_image=$cbamboo_cli_image
       export bamboo_luma_image=$cbamboo_luma_image
+      # Substitute a branch_number number 0 back, to display lack of branch number for default bamboo branch
+      [[ "$branch_number" = 0 ]] && branch_number=""
       echo "Found images for build_number=$build_number and branch_number=$branch_number in cache."
       return
     else
@@ -82,7 +86,11 @@ download_artefact() {
     fi
   fi
   echo "Downloading build ${BAMBOO_URL}/browse/ODSRV-K8SD${branch_number}-${build_number}"
+
   i=0;
+  # Substitute a branch_number number 0 back, to be used when querring bamboo
+  [[ "$branch_number" = "0" ]] && branch_number=""
+  authenticate_with_bamboo
   while : ; do
     artefact="$(curl --silent --cookie bamboo_cookie.txt ${BAMBOO_URL}/browse/ODSRV-K8SD${branch_number}-${build_number}/artifact/shared/onedata-docker-build-list.txt/onedata-docker-build-list.txt)"
     if [[ "$artefact" == "" ]] ; then
@@ -109,6 +117,8 @@ download_artefact() {
   done
   if [[ "$bamboo_oz_image" != "" ]] && [[ "$bamboo_op_image" != "" ]] && [[ "$bamboo_oc_image" != "" ]] && [[ "$bamboo_cli_image" != "" ]] && [[ "$bamboo_luma_image" != "" ]] ; then
       echo "Saving downloaded build images into ./bamboo_images_cache"
+      # Substitute a lack of branch_number with 0, so cache does not have an empty column
+      [[ "$branch_number" = "" ]] && branch_number=0
       cat <(echo "$branch_number $build_number $bamboo_oz_image $bamboo_op_image $bamboo_oc_image $bamboo_cli_image $bamboo_luma_image") <(grep -v "^488 24" bamboo_images_cache) | sponge $BABBOO_CACHE_FILE;
   fi
 }   
