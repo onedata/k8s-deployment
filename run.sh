@@ -70,11 +70,12 @@ download_artefact() {
   if [[ -n ${bamboo_cache+x} ]] ; then
     # Substitute a lack of branch_number with 0, so cache does not have an empty column
     [[ "$branch_number" = "" ]] && branch_number=0
-    read cbranch_number cbuild_number cbamboo_oz_image cbamboo_op_image cbamboo_oc_image cbamboo_cli_image cbamboo_luma_image < <(grep "^$branch_number $build_number" ./bamboo_images_cache)
-    if [[ "$cbamboo_oz_image" != "" ]] && [[ "$cbamboo_op_image" != "" ]] && [[ "$cbamboo_oc_image" != "" ]] && [[ "$cbamboo_cli_image" != "" ]] && [[ "$cbamboo_luma_image" != "" ]] ; then
+    read cbranch_number cbuild_number cbamboo_oz_image cbamboo_op_image cbamboo_oc_image cbamboo_odfsj_image cbamboo_cli_image cbamboo_luma_image < <(grep "^$branch_number $build_number" ./bamboo_images_cache)
+    if [[ "$cbamboo_oz_image" != "" ]] && [[ "$cbamboo_op_image" != "" ]] && [[ "$cbamboo_oc_image" != "" ]] && [[ "$cbamboo_odfsj_image" != "" ]] && [[ "$cbamboo_cli_image" != "" ]] && [[ "$cbamboo_luma_image" != "" ]] ; then
       export bamboo_oz_image=$cbamboo_oz_image
       export bamboo_op_image=$cbamboo_op_image
       export bamboo_oc_image=$cbamboo_oc_image
+      export bamboo_odfsj_image=$cbamboo_odfsj_image
       export bamboo_cli_image=$cbamboo_cli_image
       export bamboo_luma_image=$cbamboo_luma_image
       # Substitute a branch_number number 0 back, to display lack of branch number for default bamboo branch
@@ -109,17 +110,18 @@ download_artefact() {
         [[ $component =~ onezone ]] && export bamboo_oz_image=$image
         [[ $component =~ oneprovider ]] && export bamboo_op_image=$image
         [[ $component =~ oneclient ]]  && export bamboo_oc_image=$image
+        [[ $component =~ onedatafs-jupyter ]]  && export bamboo_odfsj_image=$image
         [[ $component =~ rest\-cli ]] && export bamboo_cli_image=$image
         [[ $component =~ luma ]] && export bamboo_luma_image=$image
       done < <(echo "$artefact")
       break
     fi
   done
-  if [[ "$bamboo_oz_image" != "" ]] && [[ "$bamboo_op_image" != "" ]] && [[ "$bamboo_oc_image" != "" ]] && [[ "$bamboo_cli_image" != "" ]] && [[ "$bamboo_luma_image" != "" ]] ; then
+  if [[ "$bamboo_oz_image" != "" ]] && [[ "$bamboo_op_image" != "" ]] && [[ "$bamboo_oc_image" != "" ]] && [[ "$bamboo_odfsj_image" != "" ]] && [[ "$bamboo_cli_image" != "" ]] && [[ "$bamboo_luma_image" != "" ]] ; then
       echo "Saving downloaded build images into ./bamboo_images_cache"
       # Substitute a lack of branch_number with 0, so cache does not have an empty column
       [[ "$branch_number" = "" ]] && branch_number=0
-      cat <(echo "$branch_number $build_number $bamboo_oz_image $bamboo_op_image $bamboo_oc_image $bamboo_cli_image $bamboo_luma_image") <(grep -v "^488 24" bamboo_images_cache) | sponge $BABBOO_CACHE_FILE;
+      cat <(echo "$branch_number $build_number $bamboo_oz_image $bamboo_op_image $bamboo_oc_image $bamboo_odfsj_image $bamboo_cli_image $bamboo_luma_image") <(grep -v "^488 24" bamboo_images_cache) | sponge $BABBOO_CACHE_FILE;
   fi
 }   
 
@@ -150,6 +152,7 @@ Options:
   --oz                       onezone docker image
   --op                       oneprovider docker image
   --oc                       oneclient docker image
+  --odfsj                     onedatafs jupyter docker image
   --lu                       luma docker image
   --cli                      rest-cli docker image
   --wait-for-clean-namespace wait for all pods to exit before starting a deployment
@@ -186,6 +189,7 @@ main() {
   oz_image=""
   op_image=""
   oc_image=""
+  odfsj_image=""
   cli_image=""
   luma_image=""
   helm_debug=""
@@ -217,6 +221,10 @@ main() {
               ;;
           --oc)
               oc_image=$2
+              shift
+              ;;
+          --odfsj)
+              odfsj_image=$2
               shift
               ;;
           --cli)
@@ -311,6 +319,7 @@ main() {
     if [[ "$oz_image" != "" ]]; then oz_image=${image_prefix}$oz_image  ; else oz_image="$bamboo_oz_image" ; fi
     if [[ "$op_image" != "" ]]; then op_image=${image_prefix}$op_image ; else op_image="$bamboo_op_image" ; fi
     if [[ "$oc_image" != "" ]]; then oc_image=${image_prefix}$oc_image ; else oc_image="$bamboo_oc_image" ; fi
+    if [[ "$odfsj_image" != "" ]]; then odfsj_image=${image_prefix}$odfsj_image ; else odfsj_image="$bamboo_odfsj_image" ; fi
     if [[ "$cli_image" != "" ]]; then cli_image=${image_prefix}$cli_image ; else cli_image="$bamboo_cli_image" ; fi
     if [[ "$luma_image" != "" ]]; then luma_image=${image_prefix}$luma_image ; else luma_image="$bamboo_luma_image" ; fi
 
@@ -318,6 +327,7 @@ main() {
     [[ "$oz_image" = "" ]] && echo "Error: Missing Onezone image! The default image will be used!" && default_image=1
     [[ "$op_image" = "" ]] && echo "Error: Missing Oneprovider image! The default image will be used!" && default_image=1
     [[ "$oc_image" = "" ]] && echo "Error: Missing Oneclient image! The default image will be used!" && default_image=1
+    [[ "$odfsj_image" = "" ]] && echo "Error: Missing OnedataFS Jupyter image! The default image will be used!" && default_image=1
     [[ "$cli_image" = "" ]] && echo "Error: Missing Onedata-cli image! The default image will be used!" && default_image=1
     [[ "$luma_image" = "" ]] && echo "Error: Missing Luma image! The default image will be used!" && default_image=1
     
@@ -336,6 +346,7 @@ main() {
     export oz_image
     export op_image
     export oc_image
+    export odfsj_image
     export cli_image
     export luma_image
     export helm_debug=$helm_debug
