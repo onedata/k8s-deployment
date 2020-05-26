@@ -75,6 +75,9 @@ fi
 if [[ "$oc_image" != "" ]]; then
   echo "  oc_image: &oc_image $oc_image" >> "$landscae_path"
 fi
+if [[ "$odfsj_image" != "" ]]; then
+  echo "  odfsj_image: &odfsj_image $odfsj_image" >> "$landscae_path"
+fi
 if [[ "$cli_image" != "" ]]; then
   echo "  cli_image: &cli_image $cli_image" >> "$landscae_path"
 fi
