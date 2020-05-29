@@ -103,12 +103,12 @@ all_group_privileges: &all_group_privileges
   - group_remove_child
   - group_add_space
   - group_leave_space
-  - group_add_cluster
-  - group_leave_cluster
   - group_create_handle_service
   - group_leave_handle_service
   - group_create_handle
   - group_leave_handle
+  - group_add_harvester
+  - group_remove_harvester
 
 all_space_privileges: &all_space_privileges
   - space_view
@@ -119,9 +119,11 @@ all_space_privileges: &all_space_privileges
   - space_read_data
   - space_write_data
   - space_manage_shares
-  - space_manage_indexes
-  - space_query_indexes
+  - space_view_views
+  - space_manage_views
+  - space_query_views
   - space_view_statistics
+  - space_view_changes_stream
   - space_view_transfers
   - space_schedule_replication
   - space_cancel_replication
@@ -133,6 +135,8 @@ all_space_privileges: &all_space_privileges
   - space_remove_group
   - space_add_provider
   - space_remove_provider
+  - space_add_harvester
+  - space_remove_harvester
 
 
 users: &all_users
@@ -337,7 +341,7 @@ spaces:
     user: *user_joe
     supports:
       - provider: "paris"
-        storage_name: "nfs"
+        storage_name: "nfs-empty"
         size: '1073741824'
   - name: "lis-3"
     user: *user_joe
@@ -351,6 +355,52 @@ spaces:
       - provider: "krakow"
         storage_name: "webdav"
         size: '1073741824'
+  - name: "krk-n-par-3"
+    user: *user_joe
+    supports:
+      - provider: "krakow"
+        storage_name: "nfs-empty"
+        size: '1073741824'
+      - provider: "paris"
+        storage_name: "s3"
+        size: '1073741824'
+  - name: "krk-3-lis-c"
+    user: *user_joe
+    supports:
+      - provider: "krakow"
+        storage_name: "s3"
+        size: '1073741824'
+      - provider: "lisbon"
+        storage_name: "ceph"
+        size: '1073741824'
+  - name: "par-n-lis-c"
+    user: *user_joe
+    supports:
+      - provider: "paris"
+        storage_name: "nfs-empty"
+        size: '1073741824'
+      - provider: "lisbon"
+        storage_name: "ceph"
+        size: '1073741824'
+  - name: "krk-3-par-c-lis-n"
+    user: *user_joe
+    supports:
+      - provider: "krakow"
+        storage_name: "s3"
+        size: '1073741824'
+      - provider: "paris"
+        storage_name: "ceph"
+        size: '1073741824'
+      - provider: "lisbon"
+        storage_name: "nfs-empty"
+        size: '1073741824'
+  - name: "krk-g"
+    user: *user_joe
+    supports:
+      - provider: "krakow"
+        storage_name: "gluster"
+        size: '1073741824' 
+  # Proper spaces with import
   - name: "par-wi"
     user: *user_joe 
     supports:
@@ -375,52 +425,6 @@ spaces:
         update:
           strategy: "simple_scan"
           deleteEnable: true
-  - name: "krk-n-par-3"
-    user: *user_joe
-    supports:
-      - provider: "krakow"
-        storage_name: "nfs"
-        size: '1073741824'
-      - provider: "paris"
-        storage_name: "s3"
-        size: '1073741824'
-  - name: "krk-3-lis-c"
-    user: *user_joe
-    supports:
-      - provider: "krakow"
-        storage_name: "s3"
-        size: '1073741824'
-      - provider: "lisbon"
-        storage_name: "ceph"
-        size: '1073741824'
-  - name: "par-n-lis-c"
-    user: *user_joe
-    supports:
-      - provider: "paris"
-        storage_name: "nfs"
-        size: '1073741824'
-      - provider: "lisbon"
-        storage_name: "ceph"
-        size: '1073741824'
-  - name: "krk-3-par-c-lis-n"
-    user: *user_joe
-    supports:
-      - provider: "krakow"
-        storage_name: "s3"
-        size: '1073741824'
-      - provider: "paris"
-        storage_name: "ceph"
-        size: '1073741824'
-      - provider: "lisbon"
-        storage_name: "nfs"
-        size: '1073741824'
-  - name: "krk-g"
-    user: *user_joe
-    supports:
-      - provider: "krakow"
-        storage_name: "gluster"
-        size: '1073741824' 
-  # Proper spaces with import
   - name: "krk-pirw-par-3-lis-n"
     user: *user_joe
     users:
@@ -453,7 +457,7 @@ spaces:
         storage_name: "s3"
         size: '1073741824'
       - provider: "lisbon"
-        storage_name: "nfs"
+        storage_name: "nfs-empty"
         size: '1073741824'
   - name: "krk-piro-par-c-lis-n"
     user: *user_joe
@@ -468,8 +472,17 @@ spaces:
         storage_name: "ceph"
         size: '1073741824'
       - provider: "lisbon"
-        storage_name: "nfs"
+        storage_name: "nfs-empty"
         size: '1073741824'
+  - name: "krk-n(covid-data-10k)irw"
+    user: *user_joe
+    supports:
+      - provider: "krakow"
+        storage_name: "nfs-covid-data-10k"
+        size: '1073741824'
+        mountInRoot: true
+        import:
+          strategy: "simple_scan"
   # Luma enabled spaces
   - name: "krk-pl-par-c"
     user: *user_joe
@@ -658,11 +671,12 @@ volume-dcache:
   
 onedata-3p: 
   enabled: *deployment_enabled
-  oz_image: &oz_image onedata/onezone:18.02.0-rc13
-  op_image: &op_image onedata/oneprovider:18.02.0-rc13
-  oc_image: &oc_image onedata/oneclient:18.02.0-rc13
-  cli_image: &cli_image onedata/rest-cli:18.02.0-rc13
-  luma_image: &luma_image onedata/luma:18.02.0-rc10
+  oz_image: &oz_image onedata/onezone:19.02.1
+  op_image: &op_image onedata/oneprovider:19.02.1
+  oc_image: &oc_image onedata/oneclient:19.02.1
+  odfsj_image: &odfsj_image onedata/onedatafs-jupyter:19.02.1
+  cli_image: &cli_image onedata/rest-cli:19.02.1
+  luma_image: &luma_image onedata/luma:19.02.1
 
   log_level: &log_level "info"
   onepanel_batch_mode_enabled: &onepanel_batch_mode_enabled true
@@ -684,12 +698,12 @@ onedata-3p:
     [].
 
   oneclients_enabled: &oneclients_enabled true
-  oneclientFlags: &oneclientFlags --force-fullblock-read
+  oneclientFlags: &oneclientFlags
   oneclientDirectIOEnabled: &oneclientDirectIOEnabled true
 
   onedata_cli_enabled: &onedata_cli_enabled true
 
-  luma_enabled: &luma_enabled true 
+  luma_enabled: &luma_enabled true
 
   jupyter_notebook_enabled: &jupyter_notebook_enabled true
 
@@ -754,6 +768,8 @@ onedata-3p:
     image: *oz_image
     onepanel_batch_mode_enabled: *onepanel_batch_mode_enabled
     log_level: *log_level
+    guiPackageVerification: true
+    harversterGuiPackageVerification: true
     generate-certificates: 
       enabled: true
     persistence:
@@ -890,9 +906,12 @@ onedata-3p:
       directIO:
         nfs:
           enabled: *oneclientDirectIOEnabled
+          mounts: *op1s-nfs-exports
       jupyter:
+        image: *odfsj_image
         enabled: true
     jupyter-notebook:
+      image: *odfsj_image
       enabled: *jupyter_notebook_enabled
       suffix: *op1s
       user:
@@ -916,7 +935,31 @@ onedata-3p:
     volume-nfs:
       enabled: *nfs_enabled
       suffix: *op1s
-      luma-enabled: *luma_enabled_nfs
+      exports: &op1s-nfs-exports
+      - name: empty
+        luma-enabled: *luma_enabled_nfs
+        readOnly: false
+        storageClaim: 1T
+      - name: covid-data-10k
+        luma-enabled: false
+        image: onedata/data-container:covid-data-10k-e6e426ada046c65552ca41fe20f8d55d
+        imagePullPolicy: IfNotPresent
+        dataPath: /data
+        readOnly: false
+        mountPermissions: 777
+        storageClaim: 1T
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: "docker.com/storage.driver"
+                  operator: In
+                  values: ["zfs"]
+      tolerations:
+        - key: "docker.com/storage.scheduling"
+          operator: "Exists"
+          effect: "PreferNoSchedule"
     volume-gluster:
       enabled: *gluster_enabled
       suffix: *op1s
@@ -982,9 +1025,12 @@ onedata-3p:
       directIO:
         nfs:
           enabled: *oneclientDirectIOEnabled
+          mounts: *op2s-nfs-exports
       jupyter:
+        image: *odfsj_image
         enabled: true
     jupyter-notebook:
+      image: *odfsj_image
       enabled: *jupyter_notebook_enabled
       suffix: *op2s
       user:
@@ -1009,6 +1055,11 @@ onedata-3p:
       enabled: *nfs_enabled
       suffix: *op2s
       luma-enabled: *luma_enabled_nfs
+      exports: &op2s-nfs-exports
+      - name: empty
+        luma-enabled: *luma_enabled_posix
+        readOnly: false
+        storageClaim: 1T
     volume-gluster:
       enabled: *gluster_enabled
       suffix: *op2s
@@ -1076,9 +1127,12 @@ onedata-3p:
       directIO:
         nfs:
           enabled: *oneclientDirectIOEnabled
+          mounts: *op3s-nfs-exports
       jupyter:
+        image: *odfsj_image
         enabled: true
     jupyter-notebook:
+      image: *odfsj_image
       enabled: *jupyter_notebook_enabled
       suffix: *op3s
       user:
@@ -1103,6 +1157,11 @@ onedata-3p:
       enabled: *nfs_enabled
       suffix: *op3s
       luma-enabled: *luma_enabled_nfs
+      exports: &op3s-nfs-exports
+      - name: empty
+        luma-enabled: *luma_enabled_posix
+        readOnly: false
+        storageClaim: 1T
     volume-gluster:
       enabled: *gluster_enabled
       suffix: *op3s
