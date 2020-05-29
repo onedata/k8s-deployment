@@ -2,8 +2,8 @@
 
 # This file specifies a chart, chart version, release name, and a file from where take variables from
 
-chart_to_deploy="local/cross-support-job-3p"
-version="0.2.15-rc31"
+chart_to_deploy="onedata/cross-support-job-3p"
+version="0.2.16"
 
 if [[ $release_name != "" ]]; then
     release_name="-n $release_name"
